@@ -1,0 +1,5 @@
+Build Wrapper around keyboard
+
+:x -> :scancode-x
+:shift-x -> (and (mod-shift-state t) :scancode-x)
+:control-x -> (and (mod-control-state t) :scancode-x)
