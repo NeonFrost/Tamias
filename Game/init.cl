@@ -1,0 +1,5 @@
+(defvar title (make-state :loops '((:top nil) (:options nil))))
+(defvar equipment (make-state :loops '((:items nil) (:armor nil) (:weapons nil)) :transition nil))
+(defvar level (make-state))
+(defvar game-over (make-state))
+(defvar paused (make-state :transition nil))

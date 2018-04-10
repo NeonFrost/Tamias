@@ -23,9 +23,3 @@
   `(if ,mouse-button
        (push (list ,mouse-button (quote ,function-name)) (cadr (assoc ,mouse-state (state-mouse ,state))))
        (push (quote ,function-name) (cadr (assoc :move (state-mouse ,state))))))
-
-(defvar title (make-state :loops '((:top nil) (:options nil))))
-(defvar equipment (make-state :loops '((:items nil) (:armor nil) (:weapons nil)) :transition nil))
-(defvar level (make-state))
-(defvar game-over (make-state))
-(defvar paused (make-state :transition nil))

@@ -32,11 +32,11 @@
   (setf (player-grapple-texture player) (create-texture renderer 32 1 8 16))
   (sdl2:texture-color-mod (player-grapple-texture player) (car +pastel-grey+) (cadr +pastel-grey+) (caddr +pastel-grey)))
 
-(defun grapple-fire (vals)
+(defun grapple-fire ()
   (if (< +grapple-points+ 3)
       (let ((x nil)
 	    (y nil))
-	(setf (values x y) (funcall vals))
+	(setf (values x y) (sdl2:mouse-state))
 	(setf (vector-3d-x (player-grapple-position player)) (entity-x player)
 	      (vector-3d-y (player-grapple-position player)) (entity-y player)
 	      (vector-3d-x (player-grapple-vector player)) (if (> x (entity-x player))

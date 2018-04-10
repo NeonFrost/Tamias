@@ -97,3 +97,13 @@ int music_internal_position(double position)
 			       (sdl2-mixer:volume-music +track-volume+))
 			(progn (setf volume-state nil)
 			       (change-level-track (track-path level-track)))))))
+
+(defun lower-volume (delta)
+  (decf max-volume delta)
+  (setf +track-volume+ max-volume)
+  (sdl2-mixer:volume-music +track-volume+))
+
+(defun raise-volume (delta)
+  (incf max-volume delta)
+  (setf +track-volume+ max-volume)
+  (sdl2-mixer:volume-music +track-volume+))

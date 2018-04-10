@@ -1,6 +1,3 @@
-#|
-File for the 'entity' structures
-|#
 (defstruct game-user
   (name "Nika")
   (level "Forest")
@@ -52,8 +49,6 @@ File for the 'entity' structures
   (y 0)
   (width 16)
   (height 16)
-#|  (position '((:x 0)
-	      (:y 0)))|#
   weapon
   armor
   sprite-sheet
