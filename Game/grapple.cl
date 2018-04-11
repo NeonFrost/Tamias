@@ -30,7 +30,7 @@
 
 (defun init-grapple-texture ()
   (setf (player-grapple-texture player) (create-texture renderer 32 1 8 16))
-  (sdl2:texture-color-mod (player-grapple-texture player) (car +pastel-grey+) (cadr +pastel-grey+) (caddr +pastel-grey)))
+  (sdl2:texture-color-mod (player-grapple-texture player) (car +dark-pastel-grey+) (cadr +dark-pastel-grey+) (caddr +dark-pastel-grey)))
 
 (defun grapple-fire ()
   (if (< +grapple-points+ 3)

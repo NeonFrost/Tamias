@@ -5,9 +5,8 @@
   (inventory (make-inventory))
   started-quests
   finished-quests
-  kills
   items-collected ;; -> '((health-potion 5) (scaler-teeth 10))
-  )
+  kills)
 
 (defstruct bounding-box
   (x 0)
@@ -15,7 +14,18 @@
   (width 16)
   (height 16))
 
-(defstruct entity
+(defstruct object
+  (x 0)
+  (y 0)
+  (width 16)
+  (height 16)
+  (vector (make-vector-3d))
+  (acceleration (make-vector-3d :z 0))
+  (friction 1)
+  (mass 1)
+  (bounding-box (make-bounding-box)))
+
+(defstruct (entity (:include object))
   name
   (attack 10)
   (attack-mod 0)
@@ -45,35 +55,33 @@
   current-action
   (symbol "E")
   (line-of-sight 10) ;meaning, it can see or ''see'' x amount of tiles away
-  (x 0)
-  (y 0)
-  (width 16)
-  (height 16)
   weapon
   armor
   sprite-sheet
   (bg-color +black+)
   (symbol-color +white+)
   (current-cell 0)
-  (bounding-box (make-bounding-box))
-  vector
-  (score 0)
-  )
+  (score 0))
 
 #|(defmacro entity-x (entity)
   `(cadr (assoc :x (entity-position ,entity))))
 (defmacro entity-y (entity)
   `(cadr (assoc :y (entity-position ,entity))))|#
 
-(defun test-collision (entity-a entity-b)
-  (let* ((bba (entity-bounding-box entity-a))
-	 (bba-x (bounding-box-x bba))
-	 (bba-y (bounding-box-y bba))
+(defun test-point-collision (a b c)
+  (if (and (>= a b)
+	   (<= a c))
+      t))
+
+(defun test-bb-collision (entity-a entity-b)
+  (let* ((bba (object-bounding-box entity-a))
+	 (bba-x (eval (bounding-box-x bba)))
+	 (bba-y (eval (bounding-box-y bba)))
 	 (bba-width (eval (bounding-box-width bba)))
 	 (bba-height (eval (bounding-box-height bba)))
-	 (bbb (entity-bounding-box entity-b))
-	 (bbb-x (bounding-box-x bbb))
-	 (bbb-y (bounding-box-y bbb))
+	 (bbb (object-bounding-box entity-b))
+	 (bbb-x (eval (bounding-box-x bbb)))
+	 (bbb-y (eval (bounding-box-y bbb)))
 	 (bbb-width (eval (bounding-box-width bbb)))
 	 (bbb-height (eval (bounding-box-height bbb))))
     (if (or (and (>= bba-x bbb-x)

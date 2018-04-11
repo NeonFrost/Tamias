@@ -22,18 +22,6 @@ On rendering strings, either use a ttf file and use a 'buffer' with the strings 
        (setf str (concatenate 'string str s)))
   str)
 
-#|
-(defun append-newline (str strs)
-  (setf str (with-output-to-string (stream)
-	      (write-string str stream)
-	      (terpri stream)
-	      ))
-  (setf str (concatenate 'string str (nth 0 strs)))
-  (if (rest strs)
-      (append-newline str (rest strs))
-      str))
-|#
-
 (defun render-character-to-buffer (cell x y buffer &key (color (list 255 255 255)))
   (let ((src-rect (sdl2:make-rect (* (cadr cell) (car character-size))
 				  (* (car cell) (cadr character-size))
@@ -54,7 +42,7 @@ On rendering strings, either use a ttf file and use a 'buffer' with the strings 
     (sdl2:free-rect tmp-rect)
     ))
 
-(defun create-text-buffer (string x y &key (width 256) (height 256) to-texture (string-case 'array))
+(defun create-text-buffer (string &key (width 256) (height 256) to-texture (string-case 'array))
   (let ((buff (sdl2:create-rgb-surface width height 32))
 	(cell-row 0)
 	(cell-column 0)
@@ -62,7 +50,9 @@ On rendering strings, either use a ttf file and use a 'buffer' with the strings 
 	(mod-y 0)
 	(ignore-val 0)
 	(texture nil)
-	(temp-value 0))
+	(temp-value 0)
+	(x 0)
+	(y 0))
     (loop for n below (length string)
        do (setf (values cell-row cell-column) (truncate (char-code (aref string n)) 16))
        ;;In order to display the text-strings correctly, the code must check for a newline character before n and use that for the divisor,

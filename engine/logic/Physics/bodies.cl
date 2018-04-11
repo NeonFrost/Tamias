@@ -1,13 +1,4 @@
 ;;;;figure out a decent name for the physics engine part of Tamias, like Elk
-(defstruct object
-  x
-  y
-  width
-  height
-  (vector (make-vector-3d))
-  (acceleration (make-vector-3d :z 0))
-  (friction 1)
-  (mass 1))
 (defstruct (joint (:include object))
   )
 (defstruct (soft-body (:include object))
@@ -21,7 +12,7 @@
 
 (defun apply-force (object &key collided-object (force 'acceleration))
   (case force
-    (gravity (- (vector-3d-y (object-vector object)) *gravity*))
+    (gravity (+ (vector-3d-y (object-vector object)) *gravity*))
     (acceleration (set-vector-3d-values (object-vector object) (object-acceleration object)))
     (friction (set-vector-3d-values (object-vector object) nil :function 'mulitply :scalar (object-friction collided-object)))
     ))
@@ -40,8 +31,7 @@
      do (render-box (+ (soft-body-x sb) (joint-x joint))
 		    (+ (soft-body-y sb) (joint-y joint))
 		    (joint-width joint)
-		    (joint-height joint))
-       ))
+		    (joint-height joint))))
 
 (defun <Place-Holder-name> (soft-body)
   "Deals with moving the soft body, i.e. a rope, and lowering it's speed due to friction"

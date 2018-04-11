@@ -36,8 +36,7 @@
      (push (quote ,name) ,screen-menus)
      (push ,name menus)
      (defun ,name (menu)
-       (draw-menu menu))
-     ))
+       (draw-menu menu))))
 (defmacro define-screen (name menus)
   `(defun ,name ()
      (loop for menu in ,menus

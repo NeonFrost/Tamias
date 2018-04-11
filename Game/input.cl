@@ -39,11 +39,12 @@
 				  (otherwise (setf state 'level)
 					     (setf selection-row 0))))
 ;;level
-(add-key :scancode-return level :down (pause-game))
+(add-key :scancode-return level :up (pause-game))
 (add-key :scancode-left level :down (setf (vector-3d-x (entity-vector player)) -8))
 (add-key :scancode-right level :down (setf (vector-3d-x (entity-vector player)) 8))
 (add-key :scancode-left level :up (stop-moving))
 (add-key :scancode-right level :up (stop-moving))
+(add-mouse :button-left level :down (grapple-fire))
 ;;game-over
 (add-key :scancode-z game-over :up (exit-to-main-menu))
 
@@ -60,5 +61,4 @@
     (paused (case selection
 	      (0 (resume-game))
 	      (1 (exit-to-main-menu))
-	      (2 (quit-game))))
-    ))
+	      (2 (quit-game))))))

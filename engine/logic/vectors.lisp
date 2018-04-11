@@ -33,5 +33,4 @@
     (subtract (setf (values (vector-3d-x vector) (vector-3d-y vector) (vector-3d-z vector))
 		    (vector-3d-sub vector vecN)))
     (multiply (setf (values (vector-3d-x vector) (vector-3d-y vector) (vector-3d-z vector))
-		    (scalar-multiply vector scalar)))
-    ))
+		    (scalar-multiply vector scalar)))))
