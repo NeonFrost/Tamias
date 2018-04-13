@@ -1,5 +1,5 @@
 (defun process-loop ()
-  (loop for func in (cadr (assoc sub-state (state-loops (eval state))))
+  (loop for func in (gethash sub-state (state-loops (eval state)))
      do (funcall func))
   )
 

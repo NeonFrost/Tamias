@@ -1,7 +1,7 @@
 #|
 On rendering strings, either use a ttf file and use a 'buffer' with the strings (rendering a string through sdl-ttf requires many calculations and procedures to take place, resulting in /massive/ slowdown if done every frame update) or use a tile sheet with 256 characters on it, take the ascii character code of each character of the string (i.e. a = 58), divide by 16, with the quotient being used for the row and the remainder being used for the column (60/16 = 3 12/16 = R:3 C:12) cell and then render it to either a buffer (recommended) or to the renderer
 |#
-
+(defvar +font-sheet+ nil)
 (defvar character-size '(16 16))
 
 (defmacro blit (src-surface src-rect dest-surface dest-rect)
@@ -48,7 +48,6 @@ On rendering strings, either use a ttf file and use a 'buffer' with the strings 
 	(cell-column 0)
 	(mod-x -1)
 	(mod-y 0)
-	(ignore-val 0)
 	(texture nil)
 	(temp-value 0)
 	(x 0)

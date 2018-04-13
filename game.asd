@@ -29,7 +29,7 @@
 				   (:file "vectors")
 				   (:file "math" :type "cl")
 				   (:file "lib" :type "cl")
-				   (:file "move-top-down" :type "cl")))
+				   (:file "move-platformer" :type "cl")))
 			 (:module "audio"
 				  :serial t
 				  :components
@@ -37,14 +37,19 @@
 			 (:module "input"
 				  :serial t
 				  :components
-				  ((:file "grapple-mouse" :type "cl")
-				   (:file "Top-Down-keyboard" :type "cl")))
+				  ((:file "mouse" :type "cl")
+				   (:file "keyboard" :type "cl")))
 			 (:file "loops" :type "cl")
 			 (:file "render-engine" :type "cl")))
 	       (:module "Game"
 			:serial t
 			:components
-			((:file "players" :type "cl")
+			((:file "init" :type "cl")
+			 (:file "level" :type "cl")
+			 (:file "grapple" :type "cl")
+			 (:file "render-title-screen" :type "cl")
+			 (:file "input" :type "cl")
+			 (:file "player" :type "cl")
 			 ))
 	       (:file "init-assets" :type "cl")
 	       (:file "Main")))

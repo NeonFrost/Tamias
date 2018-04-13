@@ -50,5 +50,6 @@
 (defun stop-moving (entity)
   (setf (vector-3d-x (entity-vector entity)) 0
 	(vector-3d-y (entity-vector entity)) 0)
-  (let* ((columns (round (/ (sprite-sheet-width (entity-sprite-sheet entity)) (nth 2 (nth 0 (sprite-sheet-cells (entity-sprite-sheet entity))))))))
-    (setf (entity-current-cell entity) (truncate (entity-current-cell entity) columns))))  
+  (if (entity-sprite-sheet entity)
+      (let* ((columns (round (/ (sprite-sheet-width (entity-sprite-sheet entity)) (nth 2 (nth 0 (sprite-sheet-cells (entity-sprite-sheet entity))))))))
+	(setf (entity-current-cell entity) (truncate (entity-current-cell entity) columns)))))

@@ -5,7 +5,7 @@
 (defvar title-name "Pong")
 (defvar state 'title)
 (defvar sub-state 'top)
-(defvar state-changing nil) ;;setf changing-state to 'state-to-change-to
+(defvar changing-state nil) ;;setf changing-state to 'state-to-change-to
 (defvar renderer nil)
 (defvar accumulator 0)
 (defvar selection 0)

@@ -8,7 +8,7 @@
 
 (defun render-title-screen ()
   (title-screen)
-  (let ((title-buffer (create-text-buffer title-name 0 0
+  (let ((title-buffer (create-text-buffer title-name
 					  :width (* (length title-name) (car character-size))
 					  :height (cadr character-size)
 					  :to-texture t
@@ -16,7 +16,6 @@
 	(title-options-buffer (create-text-buffer (start-string "  Start  "
 								" Options "
 								"Exit Game")
-						  0 0
 						  :width (* (length "Exit Game") (car character-size) 2)
 						  :height (* (cadr character-size) 3)
 						  :to-texture t
@@ -24,7 +23,6 @@
 	(options-buffer (create-text-buffer (start-string "      Volume     "
 							  (combine-strings "    Resolution   " (write-to-string *screen-width*) " X " (write-to-string *screen-height*))
 							  "Exit to Main Menu")
-					    0 0
 					    :width (* 30 (car character-size))
 					    :height (* (cadr character-size) 3)
 					    :to-texture t
@@ -36,7 +34,7 @@
 					   (round (/ (menu-width title-menu) 8))
 					   (round (/ (menu-height title-menu) 8))))
 	   (render-box (round (- (/ (menu-width title-menu) 2) (/ (menu-width title-menu) 8)))
-		       (+ (round (+ (menu-y title-menu) (/ (menu-height title-menu) 2))) (* selection (cadr character-size) 2))
+		       (+ (round (+ (menu-y title-menu) (/ (menu-height title-menu) 2))) (* *selection-row* (cadr character-size) 2))
 		       (round (/ (menu-width title-menu) 4))
 		       (* (cadr character-size) 2)
 		       :color +dark-pastel-grey+)
@@ -46,15 +44,15 @@
 					   (round (/ (menu-width title-menu) 4))
 					   (* (cadr character-size) 6))))
       (options (render-box (round (- (/ (menu-width title-menu) 2) (/ (menu-width title-menu) 8)))
-			   (+ (round (+ (menu-y title-menu) (- (/ (menu-height title-menu) 2) (/ (menu-height title-menu) 32)))) (* selection (cadr character-size) 2))
+			   (+ (round (+ (menu-y title-menu) (- (/ (menu-height title-menu) 2) (/ (menu-height title-menu) 32)))) (* *selection-row* (cadr character-size) 2))
 			   (round (*  (/ (menu-width title-menu) 8) 3))
 			   (* (cadr character-size) 2)
 			   :color +dark-pastel-grey+)
 	       (tex-blit options-buffer
-			 :dest (sdl2:make-rect (round (- (/ (menu-width title-menu) 2) (/ (menu-width title-menu) 8)))
-					       (round (+ (menu-y title-menu) (- (/ (menu-height title-menu) 2) (/ (menu-height title-menu) 32))))
-					       (round (*  (/ (menu-width title-menu) 8) 3))
-					       (* (cadr character-size) 6)))
+			 :dest (create-rectangle (list (round (- (/ (menu-width title-menu) 2) (/ (menu-width title-menu) 8)))
+						       (round (+ (menu-y title-menu) (- (/ (menu-height title-menu) 2) (/ (menu-height title-menu) 32))))
+						       (round (*  (/ (menu-width title-menu) 8) 3))
+						       (* (cadr character-size) 6))))
 	       ))
     (reset-text-buffer title-buffer)
     (reset-text-buffer title-options-buffer)

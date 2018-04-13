@@ -143,9 +143,6 @@
      (sdl2:render-fill-rect renderer rect)
      (sdl2:free-rect rect)))
 
-(defmacro blit (src-surface src-rect dest-surface dest-rect)
-  `(sdl2:blit-surface ,src-surface ,src-rect ,dest-surface ,dest-rect))
-
 (defun create-tile-buffer (surface sheet tile x y)
   (let* ((cells  (sprite-sheet-cells sheet))
 	 (src-rect (sdl2:make-rect (nth 0 (nth tile cells))
@@ -198,7 +195,7 @@
 					     :height (1+ (count #\newline str))
 					     :to-texture t
 					     :string-case 'text)))
-      (tex-blit :dest (create-rectangle (list x y w h)))
+      (tex-blit string-buffer :dest (create-rectangle (list x y w h)))
       (reset-text-buffer string-buffer))))
 #|
 ==============================================================================
@@ -206,24 +203,24 @@
 ==============================================================================
 |#
 
-(defmacro draw-line (x y x2 y2 color)
-  `(let ((r (car color))
-	 (g (cadr color))
-	 (b (caddr color))
-	 (a 255)
-	 )
-     (sdl2:set-render-draw-color screen-surface r g b a)
-     (sdl2:render-draw-line ,x ,y ,x2 ,y2)))
+(defun draw-line (x y x2 y2 &key (color '(255 255 255 255)))
+  (let ((r (car color))
+	(g (cadr color))
+	(b (caddr color))
+	(a (cadddr color))
+	)
+    (sdl2:set-render-draw-color renderer r g b a)
+    (sdl2:render-draw-line renderer x y x2 y2)))
 
-(defmacro draw-box (x y w h color)
-  `(let ((rect (sdl2:make-rect ,x ,y ,w ,h))
+(defun draw-box (x y w h color)
+  (let ((rect (sdl2:make-rect x y w h))
 	 (r (car color))
 	 (g (cadr color))
 	 (b (caddr color))
 	 (a 255)
 	 )
      (sdl2:set-render-draw-color screen-surface r g b a)
-     (sdl2:render-fill-rect screen-surface rect)
+     (sdl2:render-fill-rect renderer rect)
      (sdl2:free-rect rect)))
 
 #|
@@ -238,14 +235,13 @@
      (sdl2:set-render-draw-color screen-surface r g b a)
      (sdl2:render-draw-rect screen-surface rect)
      )
-  )|#
-#|
+  )
 (defmacro draw-battle-menu (x y w h color)
   `(progn (draw-box ,x ,y ,w ,h ,color)
 	  (draw- ,x ,y ,w ,h *white*))
-  )|#
+  )
 
-#|(defmacro draw-battle-string (str x y)
+(defmacro draw-battle-string (str x y)
 ;;;;  `(sdl:draw-string-at-* ,str ,x ,y))
 `(let* ((surface (sdl2-ttf:render-text-solid *font* ,str (car *font-color*) (cadr *font-color*) (caddr *font-color*) 0))
 (texture (sdl2:create-texture-from-surface surface)))
@@ -257,9 +253,9 @@
 				   (texture-width texture)
 				   (texture-height texture)))
 (destroy-texture texture)
-))|#
+))
 
-#|(defmacro draw-icon (icon-cell x y) ;TODO: update
+(defmacro draw-icon (icon-cell x y) ;TODO: update
 `(sdl:draw-surface-at-* *icon-sheet* ,x ,y :cell ,icon-cell))
 (defmacro rend-monster (x y monster)
   `(if (> (monster-hp ,monster) 0)
@@ -271,11 +267,11 @@
 DIALOG
 ==============================================================================
 |#
+
 (defmacro draw-d-box (db)
   `(sdl:draw-surface-at-* ,db 0 (- screen-height 32))
   )
-|#
-#|(defmacro draw-d-string (str y)
+(defmacro draw-d-string (str y)
     `(let* ((surface (sdl2-ttf:render-text-solid *font* ,str (car *font-color*) (cadr *font-color*) (caddr *font-color*) 0))
 	    (texture (sdl2:create-texture-from-surface surface)))
        (free-surface surface)
@@ -287,3 +283,4 @@ DIALOG
 					  (texture-height texture)))
        (destroy-texture texture)
        ))|#
+

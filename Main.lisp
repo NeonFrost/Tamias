@@ -60,10 +60,10 @@ starting sequence
 
 (defun game-loop ()
   (test-music)
-  (render-state)
   (if changing-state
       (process-changing-state))
   (process-loop)
+  (render-state)
   )
 
 (defun kill-textures ()
