@@ -1,9 +1,9 @@
 (defun grapple-fire ()
-  (if (and (< +grapple-points+ 4)
-	   (not +current-grapple-point+)
+  (if (and (not +current-grapple-point+)
 	   (not +pulling-player+))
       (let ((x nil)
 	    (y nil))
+	(stop-moving player)
 	(setf (values x y) (sdl2:mouse-state))
 	;;;;put in a test for whether or not a grappleable surface is at x & y
 	;;;;if it passes then do stuff below
@@ -14,6 +14,13 @@
 	      (vector-3d-x (player-grapple-vector player)) (round (/ (- x (entity-x player)) 5))
 	      (vector-3d-y (player-grapple-vector player)) (round (/ (- y (entity-y player)) 5))
 	      +current-grapple-point+ (list x y)))))
+(defun reset-grapple ()
+  (setf +current-grapple-point+ nil
+	+pulling-player+ nil
+	+grapple-animation+ nil
+	(vector-3d-x (player-grapple-vector player)) 0
+	(vector-3d-y (player-grapple-vector player)) 0)
+  (stop-moving player))
 
 (defun process-grapples ()
   (if +pulling-player+
@@ -32,7 +39,6 @@
 			      +pulling-player+ t
 			      (entity-vector player) (make-vector-3d :x (vector-3d-x (player-grapple-vector player))
 								     :y (vector-3d-y (player-grapple-vector player))))
-			(incf +grapple-points+ 1)
 			(setf +grapple-animation+ nil))
 		 (progn (incf (vector-3d-x (player-grapple-position player)) (vector-3d-x (player-grapple-vector player)))
 			(incf (vector-3d-y (player-grapple-position player)) (vector-3d-y (player-grapple-vector player)))

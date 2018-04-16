@@ -2,7 +2,9 @@
 
 (defun process-level ()
   (loop for entity in entities
-     do (move-entity (eval entity))))
+     do (if +pulling-player+
+	    (move-entity (eval entity) :friction nil)
+	    (move-entity (eval entity)))))
 (add-loop-function process-level level 'top)
 
 (defun render-entity (entity)

@@ -1,12 +1,14 @@
 ;;;;use vectors
 ;;;;SHeet orientation Down, up, right, left
-(defun move-entity (entity)
+(defun move-entity (entity &key (friction t))
   (incf (entity-x entity) (vector-3d-x (entity-vector entity)))
   (incf (entity-y entity) (vector-3d-y (entity-vector entity)))
   (setf (bounding-box-x (entity-bounding-box entity)) (entity-x entity)
 	(bounding-box-y (entity-bounding-box entity)) (entity-y entity)
 	(bounding-box-width (entity-bounding-box entity)) (entity-width entity)
 	(bounding-box-height (entity-bounding-box entity)) (entity-height entity))
+  (if friction
+      (set-vector-3d-values (object-vector entity) nil :function 'multiply :scalar 0.8))
   (if (entity-sprite-sheet entity)
       (progn (incf cell-accumulator 10)
 	     (if (> cell-accumulator 10)

@@ -1,9 +1,8 @@
 (defvar start-accumulator nil)
 
 (defun start-game ()
-  (init-grapple-texture)
-  (if (not start-accumulator)
-      (start-game-music))
+;;  (init-grapple-texture)
+  (start-game-music)
   (setf (entity-x player) (round (/ *screen-width* 2))
 	(entity-y player) (round (* (/ *screen-height* 8) 7))
 
@@ -16,7 +15,7 @@
 	(entity-x grapple-wall-2) (round (* (/ *screen-width* 8) 7))
 	(entity-y grapple-wall-2) (round (/ *screen-height* 8))
 
-	(entity-width game-floor) (round (* (/ *screen-width* 8) 5))
+	(entity-width game-floor) (round (* (/ *screen-width* 8) 6))
 	(entity-height game-floor) (round (/ *screen-height* 24))
 	
 	(entity-width grapple-wall-1) (round (/ *screen-width* 16))
@@ -28,7 +27,6 @@
 	(vector-3d-y (entity-vector player)) 0
 	started nil
 	start-accumulator 1000
-	changing-state nil
 	state 'level)
   (setf (bounding-box-x (entity-bounding-box player)) (entity-x player)
 	(bounding-box-y (entity-bounding-box player)) (entity-y player)

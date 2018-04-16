@@ -40,10 +40,19 @@
 					     (setf *selection-row* 0))))
 ;;level
 (add-key :scancode-return level :up (pause-game))
-(add-key :scancode-left level :down (setf (vector-3d-x (entity-vector player)) -8))
-(add-key :scancode-right level :down (setf (vector-3d-x (entity-vector player)) 8))
-(add-key :scancode-left level :up (stop-moving player))
-(add-key :scancode-right level :up (stop-moving player))
+(add-key :scancode-c level :down (reset-grapple))
+(add-key :scancode-left level :down (if (not (or +pulling-player+
+						 +current-grapple-point+))
+					(setf (vector-3d-x (entity-vector player)) -8)))
+(add-key :scancode-right level :down (if (not (or +pulling-player+
+						  +current-grapple-point+))
+					 (setf (vector-3d-x (entity-vector player)) 8)))
+#|(add-key :scancode-left level :up (if (not (or +pulling-player+
+					       +current-grapple-point+))
+				      (stop-moving player)))
+(add-key :scancode-right level :up (if (not (or +pulling-player+
+						+current-grapple-point+))
+				       (stop-moving player)))|#
 (add-mouse :button-left level :down (grapple-fire))
 (add-mouse :button-right level :down (decf +grapple-points+ 1))
 ;;game-over
@@ -53,7 +62,7 @@
   (case state
     (title (case sub-state
 	     (top (case *selection-row*
-		    (0 (start-game))
+		    (0 (setf changing-state 'level));;(start-game))
 		    (1 (go-to-options))
 		    (2 (quit-game))))
 	     (options (if (eq *selection-row* 2)

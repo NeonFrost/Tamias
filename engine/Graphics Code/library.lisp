@@ -139,9 +139,9 @@
 	  (b (caddr color))
 	  (a (cadddr color))
 	  (rect (sdl2:make-rect x y w h)))
-     (sdl2:set-render-draw-color renderer r g b a)
-     (sdl2:render-fill-rect renderer rect)
-     (sdl2:free-rect rect)))
+    (sdl2:set-render-draw-color renderer r g b a)
+    (sdl2:render-fill-rect renderer rect)
+    (sdl2:free-rect rect)))
 
 (defun create-tile-buffer (surface sheet tile x y)
   (let* ((cells  (sprite-sheet-cells sheet))

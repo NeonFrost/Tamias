@@ -31,6 +31,7 @@ starting sequence
 ;;      (init-engine)
       (init)
       (start-main-menu-music (track-path main-menu-track))
+      (sdl2:set-render-draw-blend-mode renderer 1)
       (sdl2:with-event-loop (:method :poll)
 	(:keydown (:keysym keysym)
 		  (keydown-check (sdl2:scancode keysym)))
@@ -60,10 +61,10 @@ starting sequence
 
 (defun game-loop ()
   (test-music)
+  (render-state)
   (if changing-state
       (process-changing-state))
   (process-loop)
-  (render-state)
   )
 
 (defun kill-textures ()

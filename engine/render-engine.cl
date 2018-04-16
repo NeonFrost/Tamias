@@ -24,13 +24,13 @@
 		 (if (eq +transition-box-alpha+ 255)
 		     (progn (setf +transition-state+ 'from
 				  state changing-state)
-			    (if (eq state 'title)
+			    (if (eq state 'level)
 				(start-game))))
 		 (if (eq +transition-box-alpha+ 0)
 		     (setf changing-state nil)))
-	  (if (eq changing-state 'level)
+#|	  (if (eq changing-state 'level)
 	      (progn (start-game)
 		     (setf state changing-state
-			   changing-state nil))
-	      (setf state changing-state
-		    changing-state nil)))))
+			   changing-state nil))|#
+	  (setf state changing-state
+		changing-state nil))));;)
