@@ -9,4 +9,4 @@
 
 (defun resume-game ()
   (setf state 'level)
-  (resume-level-music))
+  (resume-music))

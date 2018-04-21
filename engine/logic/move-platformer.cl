@@ -1,6 +1,10 @@
+(defvar ++game-type++ 'platformer)
 ;;;;use vectors
 ;;;;SHeet orientation Down, up, right, left
-(defun move-entity (entity &key (friction t))
+(defun move-entity (entity &key (friction t) game-type)
+  (if game-type
+      (setf ++game-type++ game-type))
+  ;;eventually add in a case statement that goes through the different game types
   (incf (entity-x entity) (vector-3d-x (entity-vector entity)))
   (incf (entity-y entity) (vector-3d-y (entity-vector entity)))
   (setf (bounding-box-x (entity-bounding-box entity)) (entity-x entity)

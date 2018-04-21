@@ -1,12 +1,13 @@
-(defvar old-sub-state 'top)
-(defvar equip-state nil)
-(defvar moving nil)
 (defstruct modifier-states
   control
   shift
   meta)
 (defvar modifier-states (make-modifier-states))
 
+(defun alt-t ()
+  (if (modifier-states-meta modifier-states)
+      t
+      nil))
 (defun meta-t ()
   (if (modifier-states-meta modifier-states)
       t

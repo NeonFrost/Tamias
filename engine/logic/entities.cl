@@ -63,11 +63,6 @@
   (current-cell 0)
   (score 0))
 
-#|(defmacro entity-x (entity)
-  `(cadr (assoc :x (entity-position ,entity))))
-(defmacro entity-y (entity)
-  `(cadr (assoc :y (entity-position ,entity))))|#
-
 (defun test-point-collision (a b c)
   (if (and (>= a b)
 	   (<= a c))

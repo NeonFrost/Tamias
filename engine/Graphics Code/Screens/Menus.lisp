@@ -25,10 +25,7 @@
     (sdl2:free-rect rect2)))
 
 (defmacro define-menu (name screen-menus x y w h border-color fill-color)
-  `(progn #|(if (find (quote ,name) ,screen-menus)
-	      (progn (setf ,screen-menus (remove (quote ,name) ,screen-menus))
-		     (setf menus (remove (quote ,name) menus)))|#
-     (defvar ,name (make-menu :x (+ ,x 6) :x-equation `,',x
+  `(progn (defvar ,name (make-menu :x (+ ,x 6) :x-equation `,',x
 			      :y (+ ,y 6) :y-equation `,',y
 			      :width (- ,w 12) :width-equation `,',w
 			      :height (- ,h 12) :height-equation `,',h

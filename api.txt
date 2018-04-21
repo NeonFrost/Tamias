@@ -1,0 +1,446 @@
+A file to document the ''api''
+
++===============+
+|     Logic     |
++===============+
+
++---------------+
+     Structs
++---------------+
+Game-user
+|-name
+|-level
+|-room
+|-inventory
+|-started-quests
+|-finished-quests
+|-items-collected
+|_kills
+
+Bounding-box
+|-x
+|-y
+|-width
+|_height
+
+object
+|-x
+|-y
+|-width
+|-height
+|-vector
+|-acceleration
+|-friction
+|-mass
+|_bounding-box
+
+entity
+|-PARENT:OBJECT
+|-name
+|-attack
+|-attack-mod
+|-defense
+|-defense-mod
+|-range-attack
+|-range-attack-mod
+|-magic-attack
+|-magic-attack-mod
+|-magic-defense
+|-magic-defense-mod
+|-agility
+|-agility-mod
+|-speed
+|-speed-mod
+|-dodge
+|-dodge-mod
+|-hp
+|-max-hp
+|-mp
+|-max-mp
+|-xp
+|-level
+|-elemental
+|-status
+|-extra-effect ;;unsure of implementation
+|-symbol
+|-line-of-sight
+|-weapon
+|-armor
+|-sprite-sheet
+|-bg-color
+|-symbol-color
+|-current-cell
+|_score
+
+Level
+|-name
+|-type
+|-music
+|-battle-chance
+|-creatures
+|-sheet-surface
+|_rooms
+
+Area
+|-name
+|-array
+|-texture
+|-transitions
+|-connected-areas
+|-connected-level
+|_spring
+
+Quest
+|-name
+|-started
+|-goals
+|-finished
+|-type
+|_reward
+
+Goal
+|-enemy
+|-to-kill
+|-killed
+|-item
+|-to-acquire
+|-acquired
+|-location
+|-arrived
+|-person
+|_talked
+
+Inventory
+|-weapons
+|-armor
+|-items
+|-weight
+|-max-weight
+|-max-items
+|-max-weapons
+|_max-armor
+
+Item
+|-name
+|-type
+|-target
+|-class
+|-can-equip
+|-attack
+|-defense
+|-agility
+|-restore
+|-cost
+|-amount
+|-weight
+|-information
+|_symbol
+
+Spell
+|-name
+|-cost
+|-level
+|-target
+|_effect
+
+Vector-3d
+|-x
+|-y
+|_z
+
++++++physics+++++
+Joint
+|_PARENT: object
+Soft-body
+|-PARENT: object
+|-joints
+|_shape
+
++---------------+
+   Functions
++---------------+
+(test-point-collision A B C) ;;checks to see if A is between B and C
+(test-bb-collision entity-a entity-b)
+(point-within-bounding-box point bounding-box) ;; tests to see if a point (x y) is within a bounding-box
+(within-bounding-box x y bounding-box)
+
+(move-entity entity &key FRICTION)
+(stop-moving entity)
+
+(ascii-to-string CODE) ;;ascii-code = from 0 to 255
+
+(right-triangle a b)
+(rad->degrees RADS &key EQUATION) ;;equation: one of 'sin 'cos 'tan
+(find-angle a b &key EQUATION) ;;uses 2 numbers, creates a right-triangle of them, then finds the angle (in degrees)
+
++++++vectors+++++
+(vector-3d-add VECTOR-A VECTOR-B)
+(vector-3d-sub VECTOR-A VECTOR-B)
+(scalar-multiply VECTOR-A SCALAR)
+(vector-3d-dot VECTOR-A VECTOR-B)
+(set-vector-3d-values VECTOR-A VECTOR-B &key FUNCTION SCALAR)
+
++++++physics+++++
+(calculate-force OBJECT-STRUCTURE)
+(apply-force OBJECT-STRUCTURE &key COLLIDED-OBJECT FORCE)
+(velocity OBJECT-STRUCTURE &key DIMENSIONS)
+(draw-joints SOFT-BODY)
+
++---------------+
+   Variables
++---------------+
+
++++++physics+++++
+*gravity*
+
++---------------+
+     Macros
++---------------+
+(define-level VARIABLE &key NAME TYPE MUSIC BATTLE-CHANCE CREATURES)
+(define-area HASH-SYMBOL LEVEL &key NAME ARRAY TRANSITIONS CONNECTED-AREAS CONNECTED-LEVEL SPRING)
+(define-goal &key ENEMY TO-KILL ITEM TO-ACQUIRE LOCATION PERSON)
+(define-quest &key NAME GOALS TYPE REWARD)
+(finish-quest QUEST)
+(defweapon ..)
+(defarmor ..)
+(defpotion ..)
+(defspell VAR SPELL_NAME COST ELEMENT &key LEVEL-REQUIREMENT TARGET EFFECT SPELL-LEVEL)
+(decrease-hp TARGET AMOUNT)
+
++===============+
+|     Audio     |
++===============+
+
++---------------+
+     Structs
++---------------+
+
+Sample
+|-Path
+|_(TODO:) sound | more descriptive than 'sound', like sound-object
+
+Track
+|-Path
+|-Stream
+|_Loop-point
+
++---------------+
+   Functions
++---------------+
+
+(play-sound SOUND_PATH CHANNEL);;needs fixing
+(free-sound SOUND_OBJECT)
+
+(loop-track TRACK) ;;currently unimplemented correctly
+(start-level-music MUSIC_STRUCTURE)
+(pause-music) ;;pauses all music
+(stop-music) ;;hard stops all music
+(free-music TRACK) ;;frees a music stream (track-stream TRACK)
+(resume-music) ;;resumes music after PAUSE
+(start-game-music) ;;Does it /really/ need to be a function?
+(test-music) ;;called within the main game loop, checks VOLUME-STATE ('increasing 'decreasing or 'track-changing)
+(lower-volume DELTA) ;;lowers the max-volume for everything (extra volumes will be implemented) by DELTA, an integer (whole number)
+(raise-volume DELTA) ;;raises max-volume for everything by DELTA
+
++---------------+
+    Variables
++---------------+
+
+max-volume
++track-volume+
+
++---------------+
+     Macros
++---------------+
+
+(define-track TRACK_NAME PATH_TO_MUSIC &key :LOOP-POINT (default 0))
+
++===============+
+|   Graphics    |
++===============+
+
++---------------+
+     Structs
++---------------+
+Menu
+|-x
+|-x-equation (uses the original value of X)
+|-y
+|-y-equation (uses the original value of Y)
+|-width
+|-width-equation (uses the original value of WIDTH)
+|-height
+|-height-equation (uses the original value of HEIGHT)
+|-border-color
+|_fill-color
+
+sprite-sheet
+|-width
+|-height
+|-cells
+|-file
+|-surface
+|_texture
++---------------+
+   Functions
++---------------+
+
+(combine-strings FIRST_STRING &rest STRINGS) ;;the &rest feature puts everything past that point into a list. Combines the strings into a single string and returns a string
+(start-string FIRST_STRING &rest STRINGS) ;;adds a new line to the end of each string and returns a string
+(render-character-to-buffer ..) ;;for use ONLY with (create-text-buffer ..)
+(create-text-buffer STRING &key WIDTH HEIGHT TO-TEXTURE STRING-CASE) ;;Oh boy. So, the width and height should be how many characters you want in each direction
+(font-to-surface ..) ;;Unimplemented, skeleton code for TTF support
+
+(draw-menu MENU)
+(update-window-size) ;;only call when you are changing *screen-width* and/or *screen-height*
+(render-box X Y WIDTH HEIGHT &key COLOR)
+
++---------------+
+   Variables
++---------------+
+
++font-sheet+  ;;recommendation: don't mess with this variable. Just replace font.png with what bitmap font you like. Eventually, I'll add in true-type font support (.ttf), but for now, I'm not going to. Anti-aliasing is more important at this point
+  |Paramaters| ;;can be changed, but will need a permanent 'fixture' to keep them changed. They are there to help facilitate faster prototyping
+character-size ;;the size of the characters for the font sheet
+
++black+
++white+
++pastel-grey+
++dark-pastel-grey+
++pastel-dark-grey+
++red+
++dark-red+
++green+
++blue+
++yellow+
++pastel-red+
++dark-pastel-red+
++pastel-green+
++pastel-blue+
++pastel-yellow+
++aqua+
++purple-jade+
++cobalt+
++yellow-zinc+
++chalk-white+
++brown+
++natural-green+
++dark-natural-green+
++navy-blue+
++steel-blue+
++dark-steel-blue+
+
+menus
+
+tile-buffer ;;Deprecated, unused by the engine, overwrite if you want to
++---------------+
+     Macros
++---------------+
+(define-menu MENU_NAME SCREEN_MENUS X Y WIDTH HEIGHT BORDER_COLOR FILL_COLOR)
+(define-screen SCREEN_NAME SCREEN_MENUS) ;; (screen-name) would be called first in, say (render-level) or (render-options)
+(define-buffer BUFFER) ;;DEPRECATED DON'T USE
+
+(with-rectangle NAME (list X Y WIDTH HEIGHT) BODY) ;; a 'wrapper' to facilitate faster development
+(create-rectangle (list X Y WIDTH HEIGHT)) ;;makes a rectangle
+
+(defsheet ENTITY FILE '(CELL-WIDTH CELL-HEIGHT))
+[/USED BY DEFSHEET]
+(optimize-sheet SHEET)
+(set-sheet-width sheet width)
+(set-sheet-height sheet height)
+(set-cells sheet tile-size)
+[/]
+(tex-blit TEXTURE &key SOURCE_RECTANGLE DESTINATION_RECTANGLE COLOR ANGLE CENTER FLIP)
+(draw-cell SHEET CELL X Y &key WIDTH HEIGHT COLOR ANGLE CENTER FLIP)
+(free-sheet SHEET)
+(reset-text-buffer TEXT_BUFFER)
+(draw-rectangle X Y WIDTH HEIGHT COLOR)
+
++===============+
+|     Input     |
++===============+
+
+A word about input
+Making a simpler way to deal with Input was...a giant fucking pain in the ass
+I'm going to eventually make it simpler/faster to add keys and mouse buttons (controller support is PLANNED, but is on hold for the time being)
+Currently, to add a key you will need to prepend 'scancode-' to whatever key you want, so :down is :scancode-down, :x is :scancode-x, :enter is :scancode-return
+It's a limitation I'm going to fix in the future. I think having to type in 'scancode' before each and every damn key is ridiculous. that's 8, EIGHT!, characters, meaning 200 key definitions (for the different states) becomes 1600 unnecessary keystrokes. Who the hell made that decision, the people who made the lisp package system?
+
++---------------+
+     Structs
++---------------+
+modifier-states
+|-control
+|-meta
+|_shift
+
+^don't worry about dealing with the modifier-states, just use meta-t (alt), control-t, and shift-t to test whether those buttons are pressed along with another key
+
++---------------+
+   Functions
++---------------+
+(mouse-button-check BUTTON)
+(mouse-button-release BUTTON)
+(mouse-move BUTTON-STATE X Y XREL YREL)
+
+(meta-t)
+(alt-t)
+(control-t)
+(shift-t)
+(quit-game) ;;move this
+(exit-to-main-menu)
+(go-to-options)
+(change-selection DIRECTION &key MAX-ROW MAX-COLUMN)
+(keydown-check KEY)
+(keydown-check KEY)
+
++---------------+
+   Variables
++---------------+
+*mouse-x*
+*mouse-y*
+*mouse-velocity-x*
+*mouse-velocity-y*
+
+modifier-states
+*selection-column*
+*selection-row*
+
++===============+
+|     LOOPS     |
++===============+
+
++---------------+
+   Functions
++---------------+
+(process-loop)
+(pause-game)
+(resume-game)
+(render-state)
+(process-changing-state)
+
++---------------+
+   Variables
++---------------+
++transition-box-alpha+
++transition-state+
+
++===============+
+|   Template    |
++===============+
+
++---------------+
+     Structs
++---------------+
+
++---------------+
+   Functions
++---------------+
+
++---------------+
+   Variables
++---------------+
+
++---------------+
+     Macros
++---------------+
