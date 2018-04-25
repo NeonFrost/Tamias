@@ -4,6 +4,11 @@ On rendering strings, either use a ttf file and use a 'buffer' with the strings 
 (defvar +font-sheet+ nil)
 (defvar character-size '(16 16))
 
+(defun ascii-to-string (code)
+  (if (integerp code)
+      (concatenate 'string "" (list (code-char code)))
+      (concatenate 'string "" (string code))))
+
 (defmacro blit (src-surface src-rect dest-surface dest-rect)
   `(sdl2:blit-surface ,src-surface ,src-rect ,dest-surface ,dest-rect))
 

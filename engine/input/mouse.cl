@@ -22,5 +22,5 @@
 (defun mouse-move (button-state x y xrel yrel)
   (setf *mouse-x* x
 	*mouse-y* y
-	*mouse-velocity-x* xrel
-	*mouse-velocity-y* yrel))
+	*mouse-velocity-x* (round xrel)
+	*mouse-velocity-y* (round yrel)))

@@ -3,6 +3,7 @@
 (defparameter +pastel-grey+ (list 207 207 196 255))
 (defparameter +dark-pastel-grey+ (list 52 52 40 255))
 (defparameter +pastel-dark-grey+ (list 52 52 40 255))
+(defparameter +cream+ (list 255 253 208 255))
 (defparameter +red+ (list 255 0 0 255))
 (defparameter +dark-red+ (list 127 0 0 255))
 (defparameter +green+ (list 0 255 0 255))

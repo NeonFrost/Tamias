@@ -27,7 +27,8 @@
 			    (if (eq state 'level)
 				(start-game))))
 		 (if (eq +transition-box-alpha+ 0)
-		     (setf changing-state nil)))
+		     (setf changing-state nil
+			   +transition-state+ 'to)))
 #|	  (if (eq changing-state 'level)
 	      (progn (start-game)
 		     (setf state changing-state

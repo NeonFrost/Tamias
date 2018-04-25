@@ -132,14 +132,14 @@
 
 (defun render-box (x y w h &key color)
   (let* ((color (if (not color)
-		     '(0 0 0 255)
-		     color))
-	  (r (car color))
-	  (g (cadr color))
-	  (b (caddr color))
-	  (a (or (cadddr color)
-		 255))
-	  (rect (sdl2:make-rect x y w h)))
+		    '(0 0 0 255)
+		    color))
+	 (r (car color))
+	 (g (cadr color))
+	 (b (caddr color))
+	 (a (or (cadddr color)
+		255))
+	 (rect (sdl2:make-rect x y w h)))
     (sdl2:set-render-draw-color renderer r g b a)
     (sdl2:render-fill-rect renderer rect)
     (sdl2:free-rect rect)))
@@ -191,9 +191,13 @@
 					     (write-to-string str-t)
 					     str-t))))
     (let ((string-buffer (create-text-buffer str :width (if (find #\newline str)
-							    (position #\newline str)
-							    (length str))
-					     :height (1+ (count #\newline str))
+							    (if (> (* (position #\newline str) (car character-size)) w)
+								w
+								(* (position #\newline str) (car character-size)))
+							    (if (> (* (length str) (car character-size)) w)
+								w
+								(* (length str) (car character-size))))
+					     :height (* (1+ (count #\newline str)) (cadr character-size))
 					     :to-texture t
 					     :string-case 'text)))
       (tex-blit string-buffer :dest (create-rectangle (list x y w h)))
@@ -215,14 +219,14 @@
 
 (defun draw-box (x y w h color)
   (let ((rect (sdl2:make-rect x y w h))
-	 (r (car color))
-	 (g (cadr color))
-	 (b (caddr color))
-	 (a 255)
-	 )
-     (sdl2:set-render-draw-color screen-surface r g b a)
-     (sdl2:render-fill-rect renderer rect)
-     (sdl2:free-rect rect)))
+	(r (car color))
+	(g (cadr color))
+	(b (caddr color))
+	(a 255)
+	)
+    (sdl2:set-render-draw-color screen-surface r g b a)
+    (sdl2:render-fill-rect renderer rect)
+    (sdl2:free-rect rect)))
 
 #|
 (defmacro draw-rectangle (x y w h color)
@@ -265,7 +269,7 @@
 
 #|
 ==============================================================================
-DIALOG
+                                  DIALOG
 ==============================================================================
 |#
 

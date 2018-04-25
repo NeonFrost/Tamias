@@ -53,7 +53,7 @@ int music_internal_position(double position)
   )
 
 (defun free-music (track)
-(sdl2:free-music (track-stream track))
+  (sdl2-mixer:free-music (track-stream track))
 )
 
 (defun pause-music ()

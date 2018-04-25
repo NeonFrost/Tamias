@@ -54,6 +54,8 @@
 						       (round (*  (/ (menu-width title-menu) 8) 3))
 						       (* (cadr character-size) 6))))
 	       ))
+    (if (> (length current-text-context) 0)
+	(render-string 0 0 256 128 current-text-context))
     (reset-text-buffer title-buffer)
     (reset-text-buffer title-options-buffer)
     (reset-text-buffer options-buffer)))

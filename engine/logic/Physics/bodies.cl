@@ -1,7 +1,7 @@
 ;;;;figure out a decent name for the physics engine part of Tamias, like Elk
-(defstruct (joint (:include object))
+(defstruct (joint (:include t-object))
   )
-(defstruct (soft-body (:include object))
+(defstruct (soft-body (:include t-object))
   joints
   shape)
 (defvar *gravity* 1)

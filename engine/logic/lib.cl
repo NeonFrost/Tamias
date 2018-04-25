@@ -99,12 +99,6 @@ opened
   max-weapons
   max-armor)
 
-(defun ascii-to-string (code)
-  (if (integerp code)
-      (concatenate 'string "" (list (code-char code)))
-      (concatenate 'string "" (string code)))
-  )
-
 (defstruct item
   name
   type 

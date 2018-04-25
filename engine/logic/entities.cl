@@ -14,18 +14,20 @@
   (width 16)
   (height 16))
 
-(defstruct object
+(defstruct t-object
   (x 0)
   (y 0)
   (width 16)
   (height 16)
+  (current-cell 0)
+  sprite-sheet
   (vector (make-vector-3d))
   (acceleration (make-vector-3d :z 0))
   (friction 1)
   (mass 1)
   (bounding-box (make-bounding-box)))
 
-(defstruct (entity (:include object))
+(defstruct (entity (:include t-object))
   name
   (attack 10)
   (attack-mod 0)
@@ -57,10 +59,8 @@
   (line-of-sight 10) ;meaning, it can see or ''see'' x amount of tiles away
   weapon
   armor
-  sprite-sheet
   (bg-color +black+)
   (symbol-color +white+)
-  (current-cell 0)
   (score 0))
 
 (defun test-point-collision (a b c)
@@ -69,12 +69,12 @@
       t))
 
 (defun test-bb-collision (entity-a entity-b)
-  (let* ((bba (object-bounding-box entity-a))
+  (let* ((bba (t-object-bounding-box entity-a))
 	 (bba-x (eval (bounding-box-x bba)))
 	 (bba-y (eval (bounding-box-y bba)))
 	 (bba-width (eval (bounding-box-width bba)))
 	 (bba-height (eval (bounding-box-height bba)))
-	 (bbb (object-bounding-box entity-b))
+	 (bbb (t-object-bounding-box entity-b))
 	 (bbb-x (eval (bounding-box-x bbb)))
 	 (bbb-y (eval (bounding-box-y bbb)))
 	 (bbb-width (eval (bounding-box-width bbb)))
@@ -101,7 +101,7 @@
 	     (>= y bby)
 	     (<= y bbh))
 	t)))
-	
+
 (defun within-bounding-box (x y bounding-box) ;;point = (x y), bounding-box = (object-bounding-box object)
   (let ((bbx (bounding-box-x bounding-box))
 	(bby (bounding-box-y bounding-box))
@@ -112,4 +112,4 @@
 	     (>= y bby)
 	     (<= y bbh))
 	t)))
-	
+

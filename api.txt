@@ -23,7 +23,7 @@ Bounding-box
 |-width
 |_height
 
-object
+t-object
 |-x
 |-y
 |-width
@@ -35,7 +35,7 @@ object
 |_bounding-box
 
 entity
-|-PARENT:OBJECT
+|-PARENT:T-OBJECT
 |-name
 |-attack
 |-attack-mod
@@ -150,9 +150,9 @@ Vector-3d
 
 +++++physics+++++
 Joint
-|_PARENT: object
+|_PARENT: t-object
 Soft-body
-|-PARENT: object
+|-PARENT: t-object
 |-joints
 |_shape
 
@@ -174,10 +174,10 @@ Soft-body
 (find-angle a b &key EQUATION) ;;uses 2 numbers, creates a right-triangle of them, then finds the angle (in degrees)
 
 +++++vectors+++++
-(vector-3d-add VECTOR-A VECTOR-B)
-(vector-3d-sub VECTOR-A VECTOR-B)
-(scalar-multiply VECTOR-A SCALAR)
-(vector-3d-dot VECTOR-A VECTOR-B)
+(vector-3d-add VECTOR-A VECTOR-B) ;;returns values of (+ (vector-3d-x VECTOR-A) (vector-3d-x VECTOR-B))
+(vector-3d-sub VECTOR-A VECTOR-B) ;;returns values of (- (vector-3d-x VECTOR-A) (vector-3d-x VECTOR-B))
+(scalar-multiply VECTOR-A SCALAR) ;;returns values of (* (vector-3d-x/y/z VECTOR-A) SCALAR), rounded down/up if positve/negative (4.2 = 4, -4.2 = -4)
+(vector-3d-dot VECTOR-A VECTOR-B) ;;returns dot product of VECTOR-A VECTOR-B
 (set-vector-3d-values VECTOR-A VECTOR-B &key FUNCTION SCALAR)
 
 +++++physics+++++
