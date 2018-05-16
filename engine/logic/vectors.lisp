@@ -3,8 +3,6 @@
   (y 0)
   (z 1))
 
-;;;;need to get vector equations completely done, like the cross product
-
 (defun vector-3d-add (vec1 vec2)
   (values (+ (vector-3d-x vec1) (vector-3d-x vec2))
 	  (+ (vector-3d-y vec1) (vector-3d-y vec2))

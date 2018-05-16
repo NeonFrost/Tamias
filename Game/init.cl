@@ -1,12 +1,10 @@
-(defvar title (make-state))
+(define-state title)
+(define-state level)
+(define-state game-over)
+
 (defvar equipment (make-state :transition nil))
-(defvar level (make-state))
-(defvar game-over (make-state))
 (defvar paused (make-state :transition nil))
-(start-input title)
 (start-input equipment)
-(start-input level)
-(start-input game-over)
 (start-input paused)
 
 (defstruct (grapple-surface (:include entity))
@@ -39,7 +37,13 @@
 (defvar player (make-player))
 (push 'player entities)
 
-(defun init-grapple-texture ()
-  (if (not (player-grapple-texture player))
-      (setf (player-grapple-texture player) (sdl2:create-texture-from-surface renderer (sdl2:create-rgb-surface 8 16 32))))
-  (sdl2:set-texture-color-mod (player-grapple-texture player) (car +dark-pastel-grey+) (cadr +dark-pastel-grey+) (caddr +dark-pastel-grey+)))
+(define-track main-menu-track "Game/main.ogg")
+(define-track level-track "Game/level.ogg")
+
+(defun exit-to-main-menu ()
+  (setf state 'title)
+  (setf selection 0)
+  (sdl2-mixer:halt-music)
+  (switch-track-to main-menu-track)
+  )
+

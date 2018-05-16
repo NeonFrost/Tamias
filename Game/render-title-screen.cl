@@ -55,9 +55,8 @@
 						       (* (cadr character-size) 6))))
 	       ))
     (if (> (length current-text-context) 0)
-	(render-string 0 0 256 128 current-text-context))
+	(render-string current-text-context 0 0 :width 256 :height 128 :color +white+))
     (reset-text-buffer title-buffer)
     (reset-text-buffer title-options-buffer)
     (reset-text-buffer options-buffer)))
-
 (add-to-state-render render-title-screen title)

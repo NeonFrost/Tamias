@@ -1,7 +1,6 @@
 (defun render-state ()
   (loop for render-function in (state-render-list (eval state))
      do (funcall render-function)))
-;;  (funcall (state-render-list (eval state))))
 
 (defvar +transition-box-alpha+ 0)
 (defvar +transition-state+ 'to)
@@ -29,9 +28,5 @@
 		 (if (eq +transition-box-alpha+ 0)
 		     (setf changing-state nil
 			   +transition-state+ 'to)))
-#|	  (if (eq changing-state 'level)
-	      (progn (start-game)
-		     (setf state changing-state
-			   changing-state nil))|#
 	  (setf state changing-state
-		changing-state nil))));;)
+		changing-state nil))))

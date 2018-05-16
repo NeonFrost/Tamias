@@ -2,7 +2,8 @@
 
 (defun start-game ()
 ;;  (init-grapple-texture)
-  (start-game-music)
+  (switch-track-to level-track)
+  (setf volume-state 'increasing)
   (setf (entity-x player) (round (/ *screen-width* 2))
 	(entity-y player) (round (* (/ *screen-height* 8) 7))
 

@@ -159,10 +159,10 @@ Soft-body
 +---------------+
    Functions
 +---------------+
-(test-point-collision A B C) ;;checks to see if A is between B and C
-(test-bb-collision entity-a entity-b)
+(test-point-collision A B C) ;;checks to see if A is between B and C, Example: Particle is between player-x and player-width
+(test-bb-collision entity-a entity-b) ;; Entity here is a misinomer, due to an earlier version. It will take in any t-object
 (point-within-bounding-box point bounding-box) ;; tests to see if a point (x y) is within a bounding-box
-(within-bounding-box x y bounding-box)
+(within-bounding-box x y bounding-box) ;;do I need to explain this? It checks if X and Y are within the bounding-box.
 
 (move-entity entity &key FRICTION)
 (stop-moving entity)
@@ -174,9 +174,12 @@ Soft-body
 (find-angle a b &key EQUATION) ;;uses 2 numbers, creates a right-triangle of them, then finds the angle (in degrees)
 
 +++++vectors+++++
-(vector-3d-add VECTOR-A VECTOR-B) ;;returns values of (+ (vector-3d-x VECTOR-A) (vector-3d-x VECTOR-B))
-(vector-3d-sub VECTOR-A VECTOR-B) ;;returns values of (- (vector-3d-x VECTOR-A) (vector-3d-x VECTOR-B))
+(vector-3d-add VECTOR-A VECTOR-B) ;;returns values of (+ (vector-3d-x/y/z VECTOR-A) (vector-3d-x/y/z VECTOR-B))
+
+(vector-3d-sub VECTOR-A VECTOR-B) ;;returns values of (- (vector-3d-x/y/z VECTOR-A) (vector-3d-x/y/z VECTOR-B))
+
 (scalar-multiply VECTOR-A SCALAR) ;;returns values of (* (vector-3d-x/y/z VECTOR-A) SCALAR), rounded down/up if positve/negative (4.2 = 4, -4.2 = -4)
+
 (vector-3d-dot VECTOR-A VECTOR-B) ;;returns dot product of VECTOR-A VECTOR-B
 (set-vector-3d-values VECTOR-A VECTOR-B &key FUNCTION SCALAR)
 
@@ -281,6 +284,7 @@ sprite-sheet
 |-file
 |-surface
 |_texture
+
 +---------------+
    Functions
 +---------------+
@@ -300,7 +304,7 @@ sprite-sheet
 +---------------+
 
 +font-sheet+  ;;recommendation: don't mess with this variable. Just replace font.png with what bitmap font you like. Eventually, I'll add in true-type font support (.ttf), but for now, I'm not going to. Anti-aliasing is more important at this point
-  |Paramaters| ;;can be changed, but will need a permanent 'fixture' to keep them changed. They are there to help facilitate faster prototyping
+ |Paramaters| ;;can be changed, but will need a permanent 'fixture' to keep them changed. They are there to help facilitate faster prototyping
 character-size ;;the size of the characters for the font sheet
 
 +black+
@@ -332,7 +336,6 @@ character-size ;;the size of the characters for the font sheet
 
 menus
 
-tile-buffer ;;Deprecated, unused by the engine, overwrite if you want to
 +---------------+
      Macros
 +---------------+

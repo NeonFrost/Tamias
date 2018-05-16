@@ -40,6 +40,8 @@
 	do (funcall menu (eval menu)))))
 
 (defun update-window-size ()
+  (setf *screen-width* (car (nth resolution resolution-list))
+	*screen-height* (cadr (nth resolution resolution-list)))
   (sdl2:set-window-size default-window *screen-width* *screen-height*)
   (loop for menu in menus
      do (setf (menu-x menu) (+ (eval (menu-x-equation menu)) 6)

@@ -21,6 +21,7 @@
   (height 16)
   (current-cell 0)
   sprite-sheet
+  texture
   (vector (make-vector-3d))
   (acceleration (make-vector-3d :z 0))
   (friction 1)
@@ -69,6 +70,7 @@
       t))
 
 (defun test-bb-collision (entity-a entity-b)
+  ;;BB = Bounding Box, bba = Object-a's bounding box, bbb = Object-b's bounding box
   (let* ((bba (t-object-bounding-box entity-a))
 	 (bba-x (eval (bounding-box-x bba)))
 	 (bba-y (eval (bounding-box-y bba)))
@@ -102,7 +104,7 @@
 	     (<= y bbh))
 	t)))
 
-(defun within-bounding-box (x y bounding-box) ;;point = (x y), bounding-box = (object-bounding-box object)
+(defun within-bounding-box (x y bounding-box) ;;bounding-box = (object-bounding-box object)
   (let ((bbx (bounding-box-x bounding-box))
 	(bby (bounding-box-y bounding-box))
 	(bbw (bounding-box-width bounding-box))
@@ -112,4 +114,3 @@
 	     (>= y bby)
 	     (<= y bbh))
 	t)))
-

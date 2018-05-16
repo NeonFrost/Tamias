@@ -1,42 +1,30 @@
 ;;title-screen
-(add-key :scancode-backspace title :down (if (and *text-input-state*
-						  (> *current-text-position* 0)
-						  (< *current-text-position* (length current-text-context))
-					     (setf current-text-context (with-output-to-string (stream)
-									  (write-string (subseq current-text-context 0 (1- *current-text-position*)) stream)
-									  (write-string (subseq current-text-context (1+ *current-text-position*)) stream)))))
 (add-key :scancode-up title :down (case sub-state
 				    (top (change-selection 0 :max-row 2))
 				    (options (change-selection 0 :max-row 2))))
 (add-key :scancode-down title :down (case sub-state
 				      (top (change-selection 2 :max-row 2))
 				      (options (change-selection 2 :max-row 2))))
-(add-key :scancode-right title :down (if *text-input-state*
-					 (if (< *current-text-position* (length current-text-context))
-					     (incf *current-text-position* 1)))
-	 (if (eq sub-state 'options)
-	     (case *selection-row*
-	       (0 (if (< max-volume 124)
-		      (raise-volume 5)))
-	       (1 (incf resolution 1)
-		  (if (> resolution (1- (length resolution-list)))
-		      (setf resolution 0))
-		  (setf *screen-width* (car (nth resolution resolution-list))
-			*screen-height* (cadr (nth resolution resolution-list)))
-		  (update-window-size)))))
-(add-key :scancode-left title :down (if *text-input-state*
-					(if (> *current-text-position* 0)
-					    (decf *current-text-position* 1)))
-	 (if (eq sub-state 'options)
-	     (case *selection-row*
-	       (0 (if (> max-volume 5)
-		      (lower-volume 5)))
-	       (1 (decf resolution 1)
-		  (if (< resolution 0)
-		      (setf resolution (1- (length resolution-list))))
-		  (setf *screen-width* (car (nth resolution resolution-list))
-			*screen-height* (cadr (nth resolution resolution-list)))
-		  (update-window-size)))))
+(add-key :scancode-right title :down (if (eq sub-state 'options)
+					 (case *selection-row*
+					   (0 (if (< max-volume 124)
+						  (raise-volume 5)))
+					   (1 (incf resolution 1)
+					      (if (> resolution (1- (length resolution-list)))
+						  (setf resolution 0))
+					      (setf *screen-width* (car (nth resolution resolution-list))
+						    *screen-height* (cadr (nth resolution resolution-list)))
+					      (update-window-size)))))
+(add-key :scancode-left title :down (if (eq sub-state 'options)
+					(case *selection-row*
+					  (0 (if (> max-volume 5)
+						 (lower-volume 5)))
+					  (1 (decf resolution 1)
+					     (if (< resolution 0)
+						 (setf resolution (1- (length resolution-list))))
+					     (setf *screen-width* (car (nth resolution resolution-list))
+						   *screen-height* (cadr (nth resolution resolution-list)))
+					     (update-window-size)))))
 (add-key :scancode-z title :up (confirm-selection))
 (add-key :scancode-return title :up (confirm-selection))
 (add-key :scancode-t title :down (if (meta-t)
@@ -81,7 +69,8 @@
   (case state
     (title (case sub-state
 	     (top (case *selection-row*
-		    (0 (setf changing-state 'level));;(start-game))
+		    (0 (setf changing-state 'level
+			     volume-state 'decreasing));;(start-game))
 		    (1 (go-to-options))
 		    (2 (quit-game))))
 	     (options (if (eq *selection-row* 2)

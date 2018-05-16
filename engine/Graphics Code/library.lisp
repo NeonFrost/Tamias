@@ -6,7 +6,6 @@
 (defmacro define-buffer (buffer)
   `(progn (defvar ,buffer nil)
 	  (push ,buffer buffers)))
-(defvar tile-buffer nil)
 
 (defstruct sprite-sheet
   width
@@ -16,7 +15,10 @@
   surface
   texture)
 
-;;Now for some 'helper' functions
+(defun create-texture (&key (format sdl2:+pixelformat-rgba8888+) (access 0) (width 16) (height 16) (color +white+))
+  (sdl2:set-render-draw-color renderer (car color) (cadr color) (caddr color) (cadddr color))
+  (sdl2:render-clear renderer)
+  (sdl2:create-texture renderer format access width height))
 
 (defmacro with-rectangle (name rect &body body)
   `(let ((,name (sdl2:make-rect (car ,rect)
@@ -144,22 +146,6 @@
     (sdl2:render-fill-rect renderer rect)
     (sdl2:free-rect rect)))
 
-(defun create-tile-buffer (surface sheet tile x y)
-  (let* ((cells  (sprite-sheet-cells sheet))
-	 (src-rect (sdl2:make-rect (nth 0 (nth tile cells))
-				   (nth 1 (nth tile cells))
-				   (nth 2 (nth tile cells))
-				   (nth 3 (nth tile cells))))
-	 (tsx (nth 2 (nth tile cells)))
-	 (tsy (nth 3 (nth tile cells)))
-	 (dest-rect (sdl2:make-rect x
-				    y
-				    tsx
-				    tsy)))
-    (blit (sprite-sheet-surface sheet) src-rect surface dest-rect)
-    (sdl2:free-rect src-rect)
-    (sdl2:free-rect dest-rect)))
-
 (defmacro reset-text-buffer (buffer)
   `(if ,buffer
        (progn (sdl2:destroy-texture ,buffer)
@@ -184,24 +170,34 @@
     (sdl2:free-rect src)
     (sdl2:free-rect dest)))
 
-(defun render-string (x y w h &rest strs)
-  (let ((str ""))
-    (loop for str-t in strs
-       do (setf str (combine-strings str (if (not (stringp str-t))
-					     (write-to-string str-t)
-					     str-t))))
-    (let ((string-buffer (create-text-buffer str :width (if (find #\newline str)
-							    (if (> (* (position #\newline str) (car character-size)) w)
-								w
-								(* (position #\newline str) (car character-size)))
-							    (if (> (* (length str) (car character-size)) w)
-								w
-								(* (length str) (car character-size))))
-					     :height (* (1+ (count #\newline str)) (cadr character-size))
-					     :to-texture t
-					     :string-case 'text)))
-      (tex-blit string-buffer :dest (create-rectangle (list x y w h)))
-      (reset-text-buffer string-buffer))))
+(defvar current-font-color '(127 0 0 255))
+(defun render-string (str x y &key width height (color current-font-color))
+  (let ((w (or (if (find #\newline str)
+		   (* (position #\newline str) (car character-size)))
+	       width
+	       (length str)))
+	(h (or height
+	       (1+ (count #\newline str))))
+	(width (or width
+		   0))
+	(height (or height
+		    0)))
+    (if (> (length str) 0)
+	(let* ((string-buffer (create-text-buffer str
+						  :width w
+						  :height h
+						  :to-texture t
+						  :string-case 'text))
+	       (w (if (> width (sdl2:texture-width string-buffer))
+		      (sdl2:texture-width string-buffer)
+		      w))
+	       (h (if (> height (sdl2:texture-height string-buffer))
+		      (sdl2:texture-height string-buffer)
+		      h)))
+	  (tex-blit string-buffer :src (create-rectangle (list 0 0 w h))
+		    :dest (create-rectangle (list x y w h))
+		    :color color)
+	  (reset-text-buffer string-buffer)))))
 #|
 ==============================================================================
                                  BATTLE
@@ -227,65 +223,3 @@
     (sdl2:set-render-draw-color screen-surface r g b a)
     (sdl2:render-fill-rect renderer rect)
     (sdl2:free-rect rect)))
-
-#|
-(defmacro draw-rectangle (x y w h color)
-  "Draws the 'outline' of a rectangle"
-  `(let ((rect (sdl2:make-rect ,x ,y ,w ,h))
-	 (r (car color))
-	 (g (cadr color))
-	 (b (caddr color))
-	 (a 255)
-	 )
-     (sdl2:set-render-draw-color screen-surface r g b a)
-     (sdl2:render-draw-rect screen-surface rect)
-     )
-  )
-(defmacro draw-battle-menu (x y w h color)
-  `(progn (draw-box ,x ,y ,w ,h ,color)
-	  (draw- ,x ,y ,w ,h *white*))
-  )
-
-(defmacro draw-battle-string (str x y)
-;;;;  `(sdl:draw-string-at-* ,str ,x ,y))
-`(let* ((surface (sdl2-ttf:render-text-solid *font* ,str (car *font-color*) (cadr *font-color*) (caddr *font-color*) 0))
-(texture (sdl2:create-texture-from-surface surface)))
-(free-surface surface)
-(render-copy renderer
-	     texture
-	     :source-rect (cffi:null-pointer)
-	     :dest-rect (make-rect ,x ,y
-				   (texture-width texture)
-				   (texture-height texture)))
-(destroy-texture texture)
-))
-
-(defmacro draw-icon (icon-cell x y) ;TODO: update
-`(sdl:draw-surface-at-* *icon-sheet* ,x ,y :cell ,icon-cell))
-(defmacro rend-monster (x y monster)
-  `(if (> (monster-hp ,monster) 0)
-       (sdl:draw-surface-at-* *monsters* (- (round ,x) 64) ,y :cell (monster-cell ,monster))
-       ))
-
-#|
-==============================================================================
-                                  DIALOG
-==============================================================================
-|#
-
-(defmacro draw-d-box (db)
-  `(sdl:draw-surface-at-* ,db 0 (- screen-height 32))
-  )
-(defmacro draw-d-string (str y)
-    `(let* ((surface (sdl2-ttf:render-text-solid *font* ,str (car *font-color*) (cadr *font-color*) (caddr *font-color*) 0))
-	    (texture (sdl2:create-texture-from-surface surface)))
-       (free-surface surface)
-       (render-copy renderer
-		    texture
-		    :source-rect (cffi:null-pointer)
-		    :dest-rect (make-rect 64 ,y
-					  (texture-width texture)
-					  (texture-height texture)))
-       (destroy-texture texture)
-       ))|#
-

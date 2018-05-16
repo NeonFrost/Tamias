@@ -17,9 +17,9 @@
   (if friction
       (set-vector-3d-values (t-object-vector entity) nil :function 'multiply :scalar 0.8))
   (if (t-object-sprite-sheet entity)
-      (handle-animation entity)))
+      (tamias-handle-animation entity)))
 
-(defun handle-animation (entity)
+(defun tamias-handle-animation (entity)
   (incf cell-accumulator 10)
   (if (> cell-accumulator 10)
       (let* ((columns (round (/ (sprite-sheet-width (entity-sprite-sheet entity)) (nth 2 (nth 0 (sprite-sheet-cells (entity-sprite-sheet entity)))))))

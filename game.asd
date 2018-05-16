@@ -1,6 +1,6 @@
 (defsystem :game
-  :author "Brandon Blundell"
-  :maintainer "Brandon Blundell"
+  :author "Brandon Blundell | Neon Frost"
+  :maintainer "Brandon Blundell | Neon Frost"
   :license "GPL v3"
   :version "0.9"
   :description "Description."

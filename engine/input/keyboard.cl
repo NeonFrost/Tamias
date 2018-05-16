@@ -25,13 +25,6 @@
   (sdl2:push-event :quit)
   )
 
-(defun exit-to-main-menu ()
-  (setf state 'title)
-  (setf selection 0)
-  (sdl2-mixer:halt-music)
-  (start-main-menu-music (track-path main-menu-track))
-  )
-
 (defun go-to-options ()
   (setf selection 0)
   (setf sub-state 'options))
@@ -58,6 +51,34 @@
     ((or :scancode-lctrl :scancode-rctrl) (setf (modifier-states-control modifier-states) t))
     ((or :scancode-lshift :scancode-rshift) (setf (modifier-states-shift modifier-states) t))
     ((or :scancode-lalt :scancode-ralt) (setf (modifier-states-meta modifier-states) t))
+    (:scancode-return (if *text-input-state*
+			  (progn (setf current-text-context (with-output-to-string (stream)
+							      (if (< *current-text-position* (length current-text-context))
+								  (progn (write-string (subseq current-text-context 0 (1+ *current-text-position*)) stream)
+									 (fresh-line stream)
+									 (write-string (subseq current-text-context *current-text-position*) stream))
+								  (progn (write-string (subseq current-text-context 0 *current-text-position*) stream)
+									 (fresh-line stream)
+									 (write-string (subseq current-text-context *current-text-position*) stream)))))
+				 (incf *current-text-position* 1))))
+    (:scancode-backspace (if (and *text-input-state*
+				  (> *current-text-position* 0)
+				  (< *current-text-position* (length current-text-context)))
+			     (progn (setf current-text-context (with-output-to-string (stream)
+								 (write-string (subseq current-text-context 0 (1- *current-text-position*)) stream)
+								 (write-string (subseq current-text-context *current-text-position*) stream)))
+				    (decf *current-text-position* 1))
+			     (if (and *text-input-state*
+				      (> *current-text-position* 0))
+				 (progn (setf current-text-context (with-output-to-string (stream)
+								     (write-string (subseq current-text-context 0 (1- *current-text-position*)) stream)))
+					(decf *current-text-position* 1)))))
+    (:scancode-right (if *text-input-state*
+			 (if (< *current-text-position* (length current-text-context))
+			     (incf *current-text-position* 1))))
+    (:scancode-left  (if *text-input-state*
+			 (if (> *current-text-position* 0)
+			     (decf *current-text-position* 1))))
     (:scancode-escape (quit-game)))
   (if (gethash key (gethash :down (state-keys (eval state))))
       (loop for func in (gethash key (gethash :down (state-keys (eval state))))
