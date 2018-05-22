@@ -150,6 +150,17 @@ opened
                               ENTITY
 ======================================================================
 |#
+
+(defstruct game-user
+  (name "Nika")
+  (level 'Forest)
+  (room 1)
+  (inventory (make-inventory))
+  started-quests
+  finished-quests
+  items-collected ;; -> '((health-potion 5) (shark-teeth 10))
+  kills)
+
 #|
 (defun spawn-creature (creature-structure target-point)
   (let ((x (car target-point))

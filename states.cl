@@ -28,8 +28,8 @@
 
 (defmacro add-substate-function (function-name state sub-state)
   `(if (gethash ,sub-state (state-loops ,state))
-       (append (quote ,function-name) (gethash ,sub-state (state-loops ,state))))
-       (push (quote ,function-name) (gethash ,sub-state (state-loops ,state))))
+       (append (quote ,function-name) (gethash ,sub-state (state-loops ,state)))
+       (push (quote ,function-name) (gethash ,sub-state (state-loops ,state)))))
 
 (defmacro add-loop-function (function-name state sub-state)
   `(push (quote ,function-name) (gethash ,sub-state (state-loops ,state))))

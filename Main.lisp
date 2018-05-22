@@ -75,6 +75,11 @@ starting sequence
 	     (setf +font-sheet+ nil)))
   )
 
-(defun create-exec ()
-  (sb-ext:save-lisp-and-die "main" :toplevel #'main :executable t)
+(defun create-exec (&key linking (name "main"))
+  (case linking
+    (image (asdf:load-system :cffi-grovel)
+	   (asdf:operate :static-image-op :game))
+    (app (asdf:load-system :cffi-grovel)
+	   (asdf:operate :static-program-op :game))
+    (otherwise (sb-ext:save-lisp-and-die name :toplevel #'main :executable t)))
   )

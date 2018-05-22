@@ -1,18 +1,12 @@
-(defstruct game-user
-  (name "Nika")
-  (level "Forest")
-  (room 1)
-  (inventory (make-inventory))
-  started-quests
-  finished-quests
-  items-collected ;; -> '((health-potion 5) (scaler-teeth 10))
-  kills)
-
 (defstruct bounding-box
   (x 0)
+  x-equation 
   (y 0)
+  y-equation
   (width 16)
-  (height 16))
+  width-equation
+  (height 16)
+  height-equation)
 
 (defstruct t-object
   (x 0)
@@ -27,6 +21,13 @@
   (friction 1)
   (mass 1)
   (bounding-box (make-bounding-box)))
+
+(defmacro acceleration-x (object)
+  `(vector-3d-x (object-acceleration ,object)))
+(defmacro acceleration-y (object)
+  `(vector-3d-y (object-acceleration ,object)))
+(defmacro acceleration-z (object)
+  `(vector-3d-z (object-acceleration ,object)))
 
 (defstruct (entity (:include t-object))
   name

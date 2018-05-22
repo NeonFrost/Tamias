@@ -28,8 +28,10 @@
 				  ((:file "entities" :type "cl")
 				   (:file "vectors")
 				   (:file "math" :type "cl")
-				   (:file "lib" :type "cl")
-				   (:file "move-platformer" :type "cl")))
+				   (:file "move-platformer" :type "cl")
+				   #|(:modlue "Physics"
+				   :serial t
+				   :components|#))
 			 (:module "audio"
 				  :serial t
 				  :components

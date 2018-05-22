@@ -5,10 +5,10 @@
 (defvar brick (make-t-object))
 (defvar liquid-encasing (make-t-object :x 80 :y 80 :width 240 :height 400))
 (defvar rigid-box (make-t-object))
-(defvar rope (make-soft-body :x (round (/ *screen-width* 2))
-			     :y (round (/ *screen-height* 4))
-			     :width 4
-			     :height 2))
+(defvar rope (make-group :x (round (/ *screen-width* 2))
+			 :y (round (/ *screen-height* 8))
+			 :width 4
+			 :height 2))
 (defvar rope-impulse nil)
 ;;init
 (defun buoyancy-init ()
@@ -51,8 +51,12 @@
 							 :height (t-object-height brick))))
 (defun joints-init ()
   (loop for r below 20
-     do (defjoint rope :x (t-object-x rope) :y (+ (t-object-y rope) (* r 2)) :width 4 :height 2))
-  )
+     do (create-soft-body rope :x (t-object-x rope) :y (+ (t-object-y rope) (* r 2)) :width 4 :height 2))
+  (loop for body in (group-bodies rope)
+     do (create-joint rope body :x (t-object-x body) :y (t-object-y body) :width 4 :height 2))
+  (loop for body in (group-bodies rope)
+     do (if (< (position body (group-bodies rope)) (1- (length (group-bodies rope))))
+	    (setf (joint-child-body (car (soft-body-joints body))) (list (1+ (position body (group-bodies rope))) 'rope)))))
 
 ;;render
 (defun buoyancy-render ()
@@ -73,7 +77,7 @@
   (if rope-impulse
       (loop for joint in (soft-body-joints rope)
 	 do ;;change rotation of each joint
-	   ;;check where the 
+	   ;;check which bodies are connected to the joint, change the rotation of the bodies it's connected to at 'beginning and 'end, change position of 'end
 	   ))
   )
 

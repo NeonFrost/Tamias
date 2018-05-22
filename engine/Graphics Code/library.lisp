@@ -134,7 +134,7 @@
 
 (defun render-box (x y w h &key color)
   (let* ((color (if (not color)
-		    '(0 0 0 255)
+		    '(255 255 255 255)
 		    color))
 	 (r (car color))
 	 (g (cadr color))
@@ -152,7 +152,8 @@
 	      (setf ,buffer nil))))
 
 (defun render-buffer (buffer menu &key color)
-  (sdl2:set-texture-color-mod buffer (car color) (cadr color) (caddr color))
+  (if color
+      (sdl2:set-texture-color-mod buffer (car color) (cadr color) (caddr color)))
   (let ((src (sdl2:make-rect 0
 			     0
 			     (sdl2:texture-width buffer)
@@ -172,9 +173,9 @@
 
 (defvar current-font-color '(127 0 0 255))
 (defun render-string (str x y &key width height (color current-font-color))
-  (let ((w (or (if (find #\newline str)
+  (let ((w (or width
+	       (if (find #\newline str)
 		   (* (position #\newline str) (car character-size)))
-	       width
 	       (length str)))
 	(h (or height
 	       (1+ (count #\newline str))))
@@ -182,6 +183,9 @@
 		   0))
 	(height (or height
 		    0)))
+    (if (find #\newline str)
+	(if (> (* (position #\newline str) (car character-size)) w)
+	    (setf w (* (position #\newline str) (car character-size)))))
     (if (> (length str) 0)
 	(let* ((string-buffer (create-text-buffer str
 						  :width w
