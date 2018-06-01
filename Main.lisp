@@ -25,6 +25,7 @@ starting sequence
 					     :h (cadr (nth resolution resolution-list))
 					     :flags '(:shown)))
     (sdl2:with-renderer (default-renderer default-window :flags '(:accelerated))
+      ;;add in conditional after Oreortyx is finished
       (sdl2-mixer:init :ogg)
       (sdl2-mixer:open-audio 44100 :s16sys 2 1024)
       (setf renderer (sdl2:get-renderer default-window))

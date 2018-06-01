@@ -3,6 +3,11 @@
 (defparameter +pastel-grey+ (list 207 207 196 255))
 (defparameter +dark-pastel-grey+ (list 52 52 40 255))
 (defparameter +pastel-dark-grey+ (list 52 52 40 255))
+
+(defparameter +pastel-gray+ (list 207 207 196 255))
+(defparameter +dark-pastel-gray+ (list 52 52 40 255))
+(defparameter +pastel-dark-gray+ (list 52 52 40 255))
+
 (defparameter +cream+ (list 255 253 208 255))
 (defparameter +red+ (list 255 0 0 255))
 (defparameter +dark-red+ (list 127 0 0 255))
@@ -25,3 +30,4 @@
 (defparameter +navy-blue+ (list 45 71 93 255))
 (defparameter +steel-blue+ (list 70 130 180 255))
 (defparameter +dark-steel-blue+ (list 35 65 90 255))
+(defparameter +orange+ (list 255 165 0 255))

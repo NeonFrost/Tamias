@@ -14,7 +14,6 @@
   `(progn (defvar ,state (make-state))
 	  (start-input ,state)))
 
-
 (defmacro add-to-state-render (function-name state)
   `(setf (state-render-list ,state) (append (state-render-list ,state) (list (quote ,function-name)))))
 (defmacro define-state-render (function-name state &body body)

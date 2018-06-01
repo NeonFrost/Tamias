@@ -176,16 +176,16 @@
   (let ((w (or width
 	       (if (find #\newline str)
 		   (* (position #\newline str) (car character-size)))
-	       (length str)))
+	       (* (length str) (car character-size))))
 	(h (or height
-	       (1+ (count #\newline str))))
+	       (* (1+ (count #\newline str)) (cadr character-size))))
 	(width (or width
 		   0))
 	(height (or height
 		    0)))
-    (if (find #\newline str)
+#|    (if (find #\newline str)
 	(if (> (* (position #\newline str) (car character-size)) w)
-	    (setf w (* (position #\newline str) (car character-size)))))
+	    (setf w (* (position #\newline str) (car character-size)))))|#
     (if (> (length str) 0)
 	(let* ((string-buffer (create-text-buffer str
 						  :width w
@@ -193,11 +193,11 @@
 						  :to-texture t
 						  :string-case 'text))
 	       (w (if (> width (sdl2:texture-width string-buffer))
-		      (sdl2:texture-width string-buffer)
-		      w))
+		      width
+		      (sdl2:texture-width string-buffer)))
 	       (h (if (> height (sdl2:texture-height string-buffer))
-		      (sdl2:texture-height string-buffer)
-		      h)))
+		      height
+		      (sdl2:texture-height string-buffer))))
 	  (tex-blit string-buffer :src (create-rectangle (list 0 0 w h))
 		    :dest (create-rectangle (list x y w h))
 		    :color color)
