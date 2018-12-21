@@ -15,7 +15,9 @@ On rendering strings, either use a ttf file and use a 'buffer' with the strings 
 (defun combine-strings (str &rest strings)
   "Used on strings that just need to be concatenated together, but not inserting a newline at the end of each of them."
   (loop for s in strings
-     do (setf str (concatenate 'string str s)))
+     do (if (not (stringp s))
+	    (setf s (write-to-string s)))
+       (setf str (concatenate 'string str s)))
   str)
 
 (defun start-string (str &rest strs)
@@ -47,7 +49,7 @@ On rendering strings, either use a ttf file and use a 'buffer' with the strings 
     (sdl2:free-rect tmp-rect)
     ))
 
-(defun create-text-buffer (string &key (width 256) (height 256) to-texture (string-case 'array))
+(defun create-text-buffer (string &key (width 256) (height 256) to-texture (buffer-source 'array))
   (let ((buff (sdl2:create-rgb-surface width height 32))
 	(cell-row 0)
 	(cell-column 0)
@@ -62,7 +64,7 @@ On rendering strings, either use a ttf file and use a 'buffer' with the strings 
        ;;In order to display the text-strings correctly, the code must check for a newline character before n and use that for the divisor,
        ;;or use the position of #\Newline if there is no newline character before n
 	 (if (find #\NewLine string)
-	     (case string-case
+	     (case buffer-source
 	       (array (setf (values mod-y mod-x) (truncate n (1+ (position #\Newline string)))))
 	       (text (incf mod-x 1)
 		     (incf temp-value 1)
@@ -75,7 +77,7 @@ On rendering strings, either use a ttf file and use a 'buffer' with the strings 
 			     (progn (setf mod-x 0)
 				    (incf mod-y 1)
 				    (setf temp-value 0))))))
-	     (if (eq string-case 'text)
+	     (if (eq buffer-source 'text)
 		 (progn (incf mod-x 1)
 			(if (and (eq (mod n (/ width (car character-size))) 0)
 				 (> mod-x 0))
@@ -89,7 +91,7 @@ On rendering strings, either use a ttf file and use a 'buffer' with the strings 
 			    (#\# (list 126 94 60))
 			    (#\. (list 16 60 17))
 			    (otherwise (list 255 255 255)))))
-	       (if (eq string-case 'array)
+	       (if (eq buffer-source 'array)
 		   (if (not (eq (char string n) #\0))
 		       (render-character-to-buffer (list cell-row cell-column)
 						   (+ x (* mod-x (car character-size)))
@@ -114,3 +116,83 @@ On rendering strings, either use a ttf file and use a 'buffer' with the strings 
   ;;to be implemented: making ttf fonts easier and better to use
   ;;Idea: loop through each ascii character (loop for char below 256) and push the rendered character to a surface that is then used as the font-sheet for the program
   )
+
+
+(defmacro delimit-inclusive (limiter str &key (modifier 0))
+  `(if (characterp ,limiter)
+       (subseq ,str (+ (position ,limiter ,str) ,modifier) (length ,str))
+       (if (integerp ,limiter)
+	   (subseq ,str ,limiter)
+	   (let ((dl (aref ,limiter 0)))
+	     (subseq ,str (+ (position dl ,str) ,modifier) (length ,str))
+	     ))))
+
+(defmacro delimit-exclusive (limiter str &key (modifier 0))
+  `(if (characterp ,limiter)
+       (subseq ,str (+ (1+ (position ,limiter ,str)) ,modifier) (length ,str))
+       (if (integerp ,limiter)
+	   (subseq ,str (1+ ,limiter))
+	   (let ((dl (aref ,limiter 0)))
+	     (subseq ,str (+ (1+ (position dl ,str)) ,modifier) (length ,str))
+	     ))))
+
+(defmacro delimit-to-inclusive (lower-limit upper-limit str &key (modifier 0))
+  `(if (and (characterp ,lower-limit)
+	    (characterp ,upper-limit))
+       (subseq ,str (+ (position ,lower-limit ,str) ,modifier) (position ,upper-limit ,str))
+       (let ((dl (if (characterp ,lower-limit)
+		     ,lower-limit
+		     (if (integerp ,lower-limit)
+			 (+ ,lower-limit ,modifier)
+			 (aref ,lower-limit 0))))
+	     (ul (if (characterp ,upper-limit)
+		     ,upper-limit
+		     (if (integerp ,upper-limit)
+			 ,upper-limit
+			 (aref ,upper-limit 0)))))
+	 (if (and (integerp dl)
+		  (integerp ul))
+	     (subseq ,str dl ul)
+	     (if (integerp dl)
+		 (subseq ,str dl (position ul ,str))
+		 (if (integerp ul)
+		     (subseq ,str (+ (position dl ,str) ,modifier) ul)
+		     (subseq ,str (+ (position dl ,str) ,modifier) (position ul ,str))))))))
+
+(defmacro delimit-to-exclusive (lower-limit upper-limit str &key (modifier 0))
+  `(if (and (characterp ,lower-limit)
+	    (characterp ,upper-limit))
+       (subseq ,str (+ (1+ (position ,lower-limit ,str)) ,modifier) (position ,upper-limit ,str))	   
+       (let ((dl (if (characterp ,lower-limit)
+		     ,lower-limit
+		     (if (integerp ,lower-limit)
+			 (1+ (+ ,lower-limit ,modifier))
+			 (aref ,lower-limit 0))))
+	     (ul (if (characterp ,upper-limit)
+		     ,upper-limit
+		     (if (integerp ,upper-limit)
+			 ,upper-limit
+			 (aref ,upper-limit 0)))))
+	 (princ (integerp dl)) (princ (integerp ul))
+	 (if (and (integerp dl)
+		  (integerp ul))
+	     (subseq ,str dl ul)
+	     (if (integerp dl)
+		 (subseq ,str dl (position ul ,str))
+		 (if (integerp ul)
+		     (subseq ,str (+ (1+ (position dl ,str)) ,modifier) ul)
+		     (subseq ,str (+ (1+ (position dl ,str)) ,modifier) (position ul ,str))))))))
+
+(defun parse-hex-color (str &key (return-type 'values))
+  (if (eq (aref str 0) #\#)
+      (setf str (subseq str 1)))
+  (let ((r (delimit-to-inclusive 0 2 str))
+	(g (delimit-to-inclusive 2 4 str))
+	(b (delimit-inclusive 4 str)))
+    (setf r (parse-integer r :radix 16)
+	  g (parse-integer g :radix 16)
+	  b (parse-integer b :radix 16))
+    (case return-type
+      (values (values r g b 255))
+      (list (list r g b 255))
+      (otherwise (values r g b 255)))))

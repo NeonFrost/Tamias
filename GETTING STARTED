@@ -1,0 +1,24 @@
+First and foremost, this game engine is still under active development, so various bits and pieces will be improved, replaced, or altogether removed.
+The first major thing that will be replaced will be sdl2-mixer, which will be replaced by my own "audio server" Oreortyx, which is barely a murmur at this point.
+
+Now then, there are some 'example projects' already available. You can use them as reference or you can build off of them. I don't really recommend using them, other than to make sure everything works.
+
+In order to 'build' the game engine it should be very simple. Install quicklisp first, start sbcl (the current codebase is only compatible with sbcl) in Tamias' directory then do (load "compile.cl") . This should install everything necessary to run the Tamias engine. If errors occur, make sure you have the developer libs of SDL 2 installed. Tamias uses SDL2, SDL2 mixer, and sdl2 image.
+
+Your first project [wiki to be created]
+
+A basic project would look like this:
+
+(define-state STATE_NAME)
+(setf state 'STATE_NAME)
+(defun FUNCTION_NAME ()
+       (render-box 10 10 400 400 :color +cobalt+))
+(add-to-state-render FUNCTION_NAME STATE_NAME)
+
+You can also re-evaluate functions on the fly with SLIME+Emacs.
+Example:
+With the 'basic project' typed out and eval'ed by SBCL/SLIME, change +cobalt+ to another color (basic colors provided in [path/to/tamias-folder/]engine/Graphics Code/colors.lisp , like, say, +orange+ then have the cursor within the function-definition and type C-c C-c (control-c control-c)
+
+Currently, the only way to quit the application is by hitting the escape key. Eventually, I'll change this to C-` (ctrl-` [control-backquote]) due to no other program using this binding and that there is no way that it can be accidentally activated (using a 'standard' unmodified set up of course).
+
+Questions, concerns, etc.? Contact me @neonfrost84 on twitter.

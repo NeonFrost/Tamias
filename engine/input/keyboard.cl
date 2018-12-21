@@ -12,10 +12,12 @@
   (if (modifier-states-meta modifier-states)
       t
       nil))
-(defun control-t ()
+(defun ctrl-t ()
   (if (modifier-states-control modifier-states)
       t
       nil))
+(defmacro control-t ()
+  (ctrl-t))
 (defun shift-t ()
   (if (modifier-states-shift modifier-states)
       t
@@ -47,6 +49,7 @@
 		   (setf *selection-column* max-column)))))
 
 (defun keydown-check (key)
+  ;;switch to (sym-value keysym)
   (case key
     ((or :scancode-lctrl :scancode-rctrl) (setf (modifier-states-control modifier-states) t))
     ((or :scancode-lshift :scancode-rshift) (setf (modifier-states-shift modifier-states) t))
@@ -79,7 +82,9 @@
     (:scancode-left  (if *text-input-state*
 			 (if (> *current-text-position* 0)
 			     (decf *current-text-position* 1))))
-    (:scancode-escape (quit-game)))
+    (:scancode-escape (quit-game))
+    (:scancode-grave (if (ctrl-t)
+			     (quit-game))))
   (if (gethash key (gethash :down (state-keys (eval state))))
       (loop for func in (gethash key (gethash :down (state-keys (eval state))))
 	 do (eval func))))

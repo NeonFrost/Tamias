@@ -1,12 +1,20 @@
 (defstruct bounding-box
   (x 0)
-  x-equation 
+  x-equation ;;(+ [entity-x] (/ width 4))
   (y 0)
   y-equation
   (width 16)
-  width-equation
+  width-equation ;; *screen-width* / 10
   (height 16)
   height-equation)
+(defmacro bounding-box-x (bounding-box)
+  `(eval (bounding-box-x-equation ,bounding-box)))
+(defmacro bounding-box-y (bounding-box)
+  `(eval (bounding-box-y-equation ,bounding-box)))
+(defmacro bounding-box-width (bounding-box)
+  `(eval (bounding-box-width-equation ,bounding-box)))
+(defmacro bounding-box-height (bounding-box)
+  `(eval (bounding-box-height-equation ,bounding-box)))
 
 (defstruct t-object
   (x 0)
@@ -23,14 +31,13 @@
   (bounding-box (make-bounding-box)))
 
 (defmacro acceleration-x (object)
-  `(vector-3d-x (object-acceleration ,object)))
+  `(vector-3d-x (t-object-acceleration ,object)))
 (defmacro acceleration-y (object)
-  `(vector-3d-y (object-acceleration ,object)))
+  `(vector-3d-y (t-object-acceleration ,object)))
 (defmacro acceleration-z (object)
-  `(vector-3d-z (object-acceleration ,object)))
+  `(vector-3d-z (t-object-acceleration ,object)))
 
-(defstruct (entity (:include t-object))
-  name
+(defstruct stats
   (attack 10)
   (attack-mod 0)
   (defense 0)
@@ -56,19 +63,65 @@
   (elemental 'entity)
   (status 'alive)
   extra-effect ;;;;i.e.
-  current-action
-  (symbol "E")
   (line-of-sight 10) ;meaning, it can see or ''see'' x amount of tiles away
+  current-action)
+
+(defstruct (entity (:include t-object))
+  name
+  (stats (make-stats))
   weapon
   armor
+  (symbol "E")
   (bg-color +black+)
   (symbol-color +white+)
   (score 0))
+
+(loop for stat in '(attack
+		    attack-mod
+		    defense
+		    defense-mod
+		    range-attack
+		    range-attack-mod
+		    magic-attack
+		    magic-attack-mod
+		    magic-defense
+		    magic-defense-mod
+		    agility
+		    agility-mod
+		    speed
+		    speed-mod
+		    dodge
+		    dodge-mod
+		    hp
+		    max-hp
+		    mp
+		    max-mp
+		    xp
+		    level
+		    elemental
+		    status
+		    extra-effect
+		    line-of-sight
+		    current-action)
+   do (let ((func-name (intern (string-upcase (concatenate 'string "entity-" (symbol-name stat)))))
+	    (replaced-func (intern (string-upcase (concatenate 'string "stats-" (symbol-name stat))))))
+	(eval `(defmacro ,func-name (entity)
+		 `(,',replaced-func (entity-stats ,entity))))))
 
 (defun test-point-collision (a b c)
   (if (and (>= a b)
 	   (<= a c))
       t))
+
+(defmacro define-bounding-box (&key (x 0) (y 0) (width 16) (height 16))
+  `(make-bounding-box :x ,x
+		      :x-equation ',x
+		      :y ,y
+		      :y-equation ',y
+		      :width ,width
+		      :width-equation ',width
+		      :height ,height 
+		      :height-equation ',height))
 
 (defun test-bb-collision (entity-a entity-b)
   ;;BB = Bounding Box, bba = Object-a's bounding box, bbb = Object-b's bounding box
@@ -92,7 +145,7 @@
 		     (>= (+ bba-y bba-height) bbb-y)))
 	    t))))
 
-(defun point-within-bounding-box (point bounding-box) ;;point = (x y), bounding-box = (object-bounding-box object)
+(defun point-within-bounding-box (point bounding-box) ;;point = (x y), bounding-box = (t-object-bounding-box object)
   (let ((x (car point))
 	(y (cadr point))
 	(bbx (bounding-box-x bounding-box))
@@ -105,7 +158,7 @@
 	     (<= y bbh))
 	t)))
 
-(defun within-bounding-box (x y bounding-box) ;;bounding-box = (object-bounding-box object)
+(defun within-bounding-box (x y bounding-box) ;;bounding-box = (t-object-bounding-box object)
   (let ((bbx (bounding-box-x bounding-box))
 	(bby (bounding-box-y bounding-box))
 	(bbw (bounding-box-width bounding-box))

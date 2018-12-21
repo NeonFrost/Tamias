@@ -1,3 +1,8 @@
+#|
+
+Note: On turn based games, wait until the animation is done then move on to the next turn
+
+|#
 (defstruct level
   name
   type 

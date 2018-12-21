@@ -1,0 +1,35 @@
+(define-state box)
+(setf state 'box)
+
+(defvar y-size 0)
+(defvar x-size 0)
+(defvar x-state nil)
+(defvar y-state nil)
+(defvar box-color +pastel-blue+)
+
+(defun show-box ()
+  (render-box (+ 128 x-size) (+ 128 y-size) (- 512 (* x-size 2)) (- 256 (* y-size 2)) :color box-color))
+(add-to-state-render show-box box)
+
+(defun show-sizes ()
+  (render-string (concatenate 'string (write-to-string x-size) " " (write-to-string y-size)) 64 32 :width (* 7 16) :height 32 :color +cream+))
+(add-to-state-render show-sizes box)
+
+(defun change-size ()
+  (if (>= x-size 120)
+      (setf x-state 'dec
+	    box-color +yellow-zinc+))
+  (if (<= x-size 0)
+      (setf x-state 'inc
+	    box-color +dark-natural-green+))
+  (if (>= y-size 120)
+      (setf y-state 'dec))
+  (if (<= y-size 0)
+      (setf y-state 'inc))
+  (if (eq x-state 'inc)
+      (incf x-size 1)
+      (decf x-size 1))
+  (if (eq y-state 'inc)
+      (incf y-size 1)
+      (decf y-size 1)))
+(add-loop-function change-size box 'top)

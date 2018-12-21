@@ -19,10 +19,10 @@
   (if (t-object-sprite-sheet entity)
       (tamias-handle-animation entity)))
 
-(defun tamias-handle-animation (entity)
+(defun tamias-handle-animation (entity &key frames)
   (incf cell-accumulator 10)
   (if (> cell-accumulator 10)
-      (let* ((columns (round (/ (sprite-sheet-width (entity-sprite-sheet entity)) (nth 2 (nth 0 (sprite-sheet-cells (entity-sprite-sheet entity)))))))
+      (let* ((columns (or frames (round (/ (sprite-sheet-width (entity-sprite-sheet entity)) (nth 2 (nth 0 (sprite-sheet-cells (entity-sprite-sheet entity))))))))
 	     (current-row (* (truncate (entity-current-cell entity) columns) columns)))
 	(if (or (> (vector-3d-x (entity-vector entity)) 0)
 		(> (vector-3d-y (entity-vector entity)) 0))

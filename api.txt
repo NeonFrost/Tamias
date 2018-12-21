@@ -1,4 +1,14 @@
-A file to document the ''api''
+A file to document the api
+If you look within various parts of the source code, you will come across some 'weird' looking 'hackery', specifically `,',
+What this (`,',) does is that it does *not* evaluate whatever is there, but, rather, makes it so that you have to call eval on the piece of data to get the output of said data
+The reason why this is utilised in the engine is due to the fact that certain things (bounding-boxes for one) benefit from not having a value 'captured' due to a variety of things
+One of those things is the reliance upon an equation to determine the position of something (like a UI element) or the boundaries of something (like an entity's hitbox or the clickable area of an ui element), sometimes several parts are reliant on the positioning of something, so it needs to get the value of its parent (a button inside of a container) to be positioned correctly
+
+A major thing to note is that I have focused on avoiding object oriented programming (or at least what everyone calls OOP) as much as possible
+Generics and methods are not directly implemented within Tamias. Some of the systems within Common LISP may make use of these, but I have not.
+If you have problems with the stances of anti-oop people, then take your complaints elsewhere.
+There is a focus on data-driven design and the rudimentary foundations of an Entity Component System (ECS) within Tamias. Inheritance is a great idea, so are methods, but when one has to continously rewrite code, what's the point?
+What can be achieved with a generic and a hundred methods can be achieved with a switch case
 
 +===============+
 |     Logic     |
@@ -21,7 +31,11 @@ Bounding-box
 |-x
 |-y
 |-width
-|_height
+|-height
+|-x-equation
+|-y-equation
+|-width-equation
+|_height-equation
 
 t-object
 |-x
@@ -71,6 +85,7 @@ entity
 |-symbol-color
 |-current-cell
 |_score
+;;Note: Entity will be spread out further to facilitate lower storage space per entity (i.e. putting attck and other stats [excluding hp] into other structs)
 
 Level
 |-name
@@ -159,7 +174,7 @@ Soft-body
 +---------------+
    Functions
 +---------------+
-(test-point-collision A B C) ;;checks to see if A is between B and C, Example: Particle is between player-x and player-width
+(test-point-collision A B C) ;;checks to see if A is between B and C, Example: Particle-x is between player-x and player-width
 (test-bb-collision entity-a entity-b) ;; Entity here is a misinomer, due to an earlier version. It will take in any t-object
 (point-within-bounding-box point bounding-box) ;; tests to see if a point (x y) is within a bounding-box
 (within-bounding-box x y bounding-box) ;;do I need to explain this? It checks if X and Y are within the bounding-box.
@@ -199,6 +214,7 @@ Soft-body
 +---------------+
      Macros
 +---------------+
+#:These will more than likely be taken out of the final version.
 (define-level VARIABLE &key NAME TYPE MUSIC BATTLE-CHANCE CREATURES)
 (define-area HASH-SYMBOL LEVEL &key NAME ARRAY TRANSITIONS CONNECTED-AREAS CONNECTED-LEVEL SPRING)
 (define-goal &key ENEMY TO-KILL ITEM TO-ACQUIRE LOCATION PERSON)
@@ -220,7 +236,7 @@ Soft-body
 
 Sample
 |-Path
-|_(TODO:) sound | more descriptive than 'sound', like sound-object
+|_(TODO:) sound | more descriptive than 'sound', like sound-object or audio-object
 
 Track
 |-Path

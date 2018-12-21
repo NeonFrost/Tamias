@@ -19,6 +19,9 @@
 (defparameter +pastel-green+ (list 180 242 156 255))
 (defparameter +pastel-blue+ (list 167 236 251 255))
 (defparameter +pastel-yellow+ (list 255 255 186 255))
+(defparameter +pastel-pink+ (list 255 209 220 255))
+(defparameter +dark-pastel-pink+ (parse-hex-color "e5b3b7" :return-type 'list))
+
 (defparameter +aqua+ (list 160 217 208 255))
 (defparameter +purple-jade+ (list 225 61 147 255))
 (defparameter +cobalt+ (list 5 128 198 255))

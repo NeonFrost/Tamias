@@ -19,7 +19,7 @@
 (defun apply-force (object &key collided-object (force 'acceleration))
   (case force
     (gravity (+ (vector-3d-y (object-vector object)) *gravity*))
-    (buoyancy (if (is-submerged object)
+    (buoyancy (if (is-submerged object) ;; vs on the surface
 		  (progn (decf (vector-3d-y (object-vector object)) (nth 4 *current-liquid*))
 			 (setf *current-liquid* nil))
 		  ))

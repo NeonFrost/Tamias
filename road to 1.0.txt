@@ -1,0 +1,38 @@
+Required implementations:
+Input
+Graphics
+Audio
+OS interaction (files mainly)
+Demos - Rendering
+      	States
+	Input
+	Audio
+	Physics
+	animation
+
+Input:
+Keyboard focus until 0.9, where rudimentary controller support will be added
+Move from :scancode-KEY to :KEY
+better mouse support
+check with os to see if mod keys are being used rather than left/right modkeys (I have the caps lock key acting as a control key and it doesn't
+      	      	     	    	     	   	       	    	       	        register as control.)
+
+Gfx:
+Implement cirles and arcs
+refactor spritesheet stuff
+ensure all gfx functions work
+Cull as necessary
+Fix image fonts, implement ttf support
+
+Audio:
+Refactor and fix music subsystem (currently not broken, but feels like it needs work.)
+make it easier to do stuff with music files
+implement ability to use multiple extensions (mp3 et al)
+Ensure sfx are easy to use
+
+OS:
+Unsure, probably make save files easy to implement (i.e. (save-file "name.EXT" things to save) (load-file "file.ext")
+
+Demos:
+Self explanatory
+

@@ -1,0 +1,10 @@
+Reduce Globals
+       Recommendation: Make a struct named engine-state.
+       		       Put a large amount of the current variables into engine-state
+       		       Make a variable called engine-state
+
+Bug hunting
+
+Redundant code
+
+Simplify interfaces
