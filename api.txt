@@ -17,16 +17,6 @@ What can be achieved with a generic and a hundred methods can be achieved with a
 +---------------+
      Structs
 +---------------+
-Game-user
-|-name
-|-level
-|-room
-|-inventory
-|-started-quests
-|-finished-quests
-|-items-collected
-|_kills
-
 Bounding-box
 |-x
 |-y
@@ -48,9 +38,7 @@ t-object
 |-mass
 |_bounding-box
 
-entity
-|-PARENT:T-OBJECT
-|-name
+stats
 |-attack
 |-attack-mod
 |-defense
@@ -80,12 +68,16 @@ entity
 |-line-of-sight
 |-weapon
 |-armor
+
+entity
+|-PARENT:T-OBJECT
+|-name
+|-stats {stats structure}
 |-sprite-sheet
 |-bg-color
 |-symbol-color
 |-current-cell
 |_score
-;;Note: Entity will be spread out further to facilitate lower storage space per entity (i.e. putting attck and other stats [excluding hp] into other structs)
 
 Level
 |-name
@@ -162,6 +154,19 @@ Vector-3d
 |-x
 |-y
 |_z
+
+---In rpg-lib.cl
+Game-user
+|-name
+|-level
+|-room
+|-inventory
+|-started-quests
+|-finished-quests
+|-items-collected
+|_kills
+---
+
 
 +++++physics+++++
 Joint
@@ -378,12 +383,6 @@ menus
 +===============+
 |     Input     |
 +===============+
-
-A word about input
-Making a simpler way to deal with Input was...a giant fucking pain in the ass
-I'm going to eventually make it simpler/faster to add keys and mouse buttons (controller support is PLANNED, but is on hold for the time being)
-Currently, to add a key you will need to prepend 'scancode-' to whatever key you want, so :down is :scancode-down, :x is :scancode-x, :enter is :scancode-return
-It's a limitation I'm going to fix in the future. I think having to type in 'scancode' before each and every damn key is ridiculous. that's 8, EIGHT!, characters, meaning 200 key definitions (for the different states) becomes 1600 unnecessary keystrokes. Who the hell made that decision, the people who made the lisp package system?
 
 +---------------+
      Structs
