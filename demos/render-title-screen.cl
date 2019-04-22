@@ -10,23 +10,17 @@
   (title-screen)
   (let ((title-buffer (create-text-buffer title-name
 					  :width (* (length title-name) (car character-size))
-					  :height (cadr character-size)
-					  :to-texture t
-					  :buffer-source 'text))
+					  :height (cadr character-size)))
 	(title-options-buffer (create-text-buffer (start-string "  Start  "
 								" Options "
 								"Exit Game")
 						  :width (* (length "Exit Game") (car character-size) 2)
-						  :height (* (cadr character-size) 3)
-						  :to-texture t
-						  :buffer-source 'text))
+						  :height (* (cadr character-size) 3)))
 	(options-buffer (create-text-buffer (start-string "      Volume     "
 							  (combine-strings "    Resolution   " (write-to-string *screen-width*) " X " (write-to-string *screen-height*))
 							  "Exit to Main Menu")
 					    :width (* 30 (car character-size))
-					    :height (* (cadr character-size) 3)
-					    :to-texture t
-					    :buffer-source 'text)))
+					    :height (* (cadr character-size) 3))))
     (case sub-state
       (top (tex-blit title-buffer
 		     :dest (sdl2:make-rect (round (- (/ (menu-width title-menu) 2) (* (car character-size) (length title-name))))

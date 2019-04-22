@@ -23,8 +23,11 @@
 		 (if (eq +transition-box-alpha+ 255)
 		     (progn (setf +transition-state+ 'from
 				  state changing-state)
-			    (if (eq state 'level)
-				(start-game))))
+			    #|(if (eq state 'level)
+				(start-game))
+			    commenting this out shouldn't affect anything
+			    but, every change breaks something|#
+			    ))
 		 (if (eq +transition-box-alpha+ 0)
 		     (setf changing-state nil
 			   +transition-state+ 'to)))

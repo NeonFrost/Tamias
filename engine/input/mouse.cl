@@ -19,11 +19,11 @@
 (defvar *mouse-y* 0)
 (defvar *mouse-velocity-x* 0)
 (defvar *mouse-velocity-y* 0)
-(defun mouse-move (button-state x y xrel yrel)
+(defun mouse-move (button-state x y xrel yrel) ;;causes style warning, nothing to worry about atm.
   (setf *mouse-x* x
 	*mouse-y* y
 	*mouse-velocity-x* xrel
-	*mouse-velocity-y* yrel)
+	*mouse-velocity-y* yrel) 
   (if (gethash :move (state-mouse (eval state)))
       (loop for func in (gethash :move (state-mouse (eval state)))
 	   do (eval func))))

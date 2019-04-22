@@ -1,12 +1,15 @@
 (defstruct bounding-box
+#|
   (x 0)
-  x-equation ;;(+ [entity-x] (/ width 4))
-  (y 0)
-  y-equation
+  (y 0)  
   (width 16)
-  width-equation ;; *screen-width* / 10
   (height 16)
+|#
+  x-equation ;;(+ [entity-x] (/ width 4))
+  y-equation
+  width-equation ;; *screen-width* / 10
   height-equation)
+;;I'm not sure how to go about this, but I want to have bounding box's be a pseudo-object, that is, that they have an 'x,y,etc.' but aren't explicitly defined in and of themselves.
 (defmacro bounding-box-x (bounding-box)
   `(eval (bounding-box-x-equation ,bounding-box)))
 (defmacro bounding-box-y (bounding-box)

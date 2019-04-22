@@ -10,8 +10,8 @@
   :depends-on (:sdl2
 	       :sdl2-image
 	       :sdl2-mixer)
-  :components ((:file "values" :type "cl")
-	       (:file "states" :type "cl")
+  :components ((:file "states" :type "cl")
+	       (:file "values" :type "cl")
 	       (:module "engine"
 			:serial t
 			:components
@@ -36,7 +36,8 @@
 			 (:module "audio"
 				  :serial t
 				  :components
-				  ((:file "music")))
+				  ((:file "music")
+				   (:file "sound")))
 			 (:module "input"
 				  :serial t
 				  :components

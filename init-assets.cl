@@ -15,8 +15,8 @@
   (loop for **asset** in **tamias-assets**
      do (let ((var (car **asset**)))
 	  (case (cadr **asset**)
-	    ((image texture) (setf var (sdl2:create-texture-from-surface renderer (sdl2-image:load-image (caddr **asset**))))) ;;sets the variable to a loaded image from the file
-	    ((sprite-sheeet tile-sheet) (setf var (make-sprite-sheet :file (caddr **asset**)))
-	     (load-sheet var (nth 4 **asset**))) ;;loads the sprite sheet to variable
-	    ((track music) (setf var (make-track :path (caddr **asset**) :loop-point (nth 3 **asset**))))
-	    ((sample sound) (setf var (make-sample :path (caddr **asset**))))))))
+	    ((image texture) (set var (sdl2:create-texture-from-surface renderer (sdl2-image:load-image (caddr **asset**))))) ;;sets the variable to a loaded image from the file
+	    ((sprite-sheet tile-sheet) (set var (make-sprite-sheet :file (caddr **asset**)))
+	     (load-sheet (eval var) (nth 4 **asset**))) ;;loads the sprite sheet to variable
+	    ((track music) (set var (make-track :path (caddr **asset**) :loop-point (nth 3 **asset**))))
+	    ((sample sound) (set var (make-sample :path (caddr **asset**))))))))

@@ -12,27 +12,31 @@ Demos - Rendering
 
 Input:
 Keyboard focus until 0.9, where rudimentary controller support will be added
-Move from :scancode-KEY to :KEY
+DONE: Move from :scancode-KEY to :KEY
 better mouse support
-check with os to see if mod keys are being used rather than left/right modkeys (I have the caps lock key acting as a control key and it doesn't
-      	      	     	    	     	   	       	    	       	        register as control.)
+FIXED: check with os to see if mod keys are being used rather than left/right modkeys (I have the caps lock key acting as a control key and it doesn't
+       	      	     	    	     	   	       	    	       	        register as control.)
 
 Gfx:
 Implement cirles and arcs
-refactor spritesheet stuff
-ensure all gfx functions work
-Cull as necessary
-Fix image fonts, implement ttf support
+refactor spritesheet stuff - Currently being worked on
+ensure all gfx functions work - IN PROGRESS
+Cull as necessary - IN PROGRESS
+Fix image fonts, implement ttf support - IN PROGRESS
 
 Audio:
 Refactor and fix music subsystem (currently not broken, but feels like it needs work.)
 make it easier to do stuff with music files
-implement ability to use multiple extensions (mp3 et al)
+implement ability to use multiple extensions (mp3 et al) - CAN'T FIX - As far as I can tell, when sdl mixer is loaded up, it can only handle {ext} and wav files,
+	  	     	 	  	     	     	   	       	      	       	     	      	       	      	  ext for music wav for sound
 Ensure sfx are easy to use
 
 OS:
-Unsure, probably make save files easy to implement (i.e. (save-file "name.EXT" things to save) (load-file "file.ext")
+Unsure, probably make save files easy to implement (i.e. (save-game "name.EXT" things to save) (load-save-game "file.ext")
 
 Demos:
 Self explanatory
+One that uses the particle system
+Audio: Change tracks, play-sound on key press
+
 

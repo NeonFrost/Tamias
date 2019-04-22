@@ -19,12 +19,12 @@ starting sequence
 (defun main ()
   (make-random-state)
   (sdl2:with-init (:everything)
-    (setf default-window (sdl2:create-window :title title-name
+    (setf default-window (sdl2:create-window :title game-title
 					     :w (car (nth resolution resolution-list))
 					     :h (cadr (nth resolution resolution-list))
 					     :flags '(:shown)))
     (sdl2:with-renderer (default-renderer default-window :flags '(:accelerated))
-      ;;add in conditional after Oreortyx is finished
+      ;;add in conditional after Oreortyx is finished, ie (if not probe-file oreortyx, blah blah)
       (sdl2-mixer:init :ogg)
       (sdl2-mixer:open-audio 44100 :s16sys 2 1024)
       (setf renderer (sdl2:get-renderer default-window))
@@ -68,15 +68,14 @@ starting sequence
   (render-state)
   (if changing-state
       (process-changing-state))
-  (process-loop)
-  )
+  (process-loop))
 
 (defun kill-textures ()
   (setf buffers nil)
   (loop for **asset** in **tamias-assets**
      do (case (cadr **asset**)
-	  ((image texture) (free-sheet (car **asset**)))
-	  ((sprite-sheeet tile-sheet) '()))) ;;loads the sprite sheet to variable
+	  ((image texture) (sdl2:destroy-texture (eval (car **asset**))))
+	  ((sprite-sheeet tile-sheet) (free-sheet (eval (car **asset**))))))
   (if +font-sheet+
       (progn (sdl2:free-surface +font-sheet+)
 	     (setf +font-sheet+ nil))))

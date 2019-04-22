@@ -9,7 +9,7 @@
   height-equation
   border-color
   fill-color)
-(defvar menus nil)
+(defvar **tamias-menus** nil)
 (defun draw-menu (menu)
   (let ((rect1 (sdl2:make-rect (- (menu-x menu) 6) (- (menu-y menu) 6)
 			       (+ (menu-width menu) 12) (+ (menu-height menu) 12)))
@@ -31,7 +31,7 @@
 			      :height (- ,h 12) :height-equation `,',h
 			      :border-color ,border-color :fill-color ,fill-color))
      (push (quote ,name) ,screen-menus)
-     (push ,name menus)
+     (push ,name **tamias-menus**)
      (defun ,name (menu)
        (draw-menu menu))))
 (defmacro define-screen (name menus)
@@ -43,7 +43,7 @@
   (setf *screen-width* (car (nth resolution resolution-list))
 	*screen-height* (cadr (nth resolution resolution-list)))
   (sdl2:set-window-size default-window *screen-width* *screen-height*)
-  (loop for menu in menus
+  (loop for menu in **tamias-menus**
      do (setf (menu-x menu) (+ (eval (menu-x-equation menu)) 6)
 	      (menu-y menu) (+ (eval (menu-y-equation menu)) 6)
 	      (menu-width menu) (- (eval (menu-width-equation menu)) 12)

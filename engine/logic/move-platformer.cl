@@ -10,10 +10,12 @@
   |#
   (incf (entity-x entity) (vector-3d-x (entity-vector entity)))
   (incf (entity-y entity) (vector-3d-y (entity-vector entity)))
-  (setf (bounding-box-x (entity-bounding-box entity)) (entity-x entity)
+#|  (setf (bounding-box-x (entity-bounding-box entity)) (entity-x entity)
 	(bounding-box-y (entity-bounding-box entity)) (entity-y entity)
 	(bounding-box-width (entity-bounding-box entity)) (entity-width entity)
 	(bounding-box-height (entity-bounding-box entity)) (entity-height entity))
+shouldn't change anything, again
+|#
   (if friction
       (set-vector-3d-values (t-object-vector entity) nil :function 'multiply :scalar 0.8))
   (if (t-object-sprite-sheet entity)

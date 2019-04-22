@@ -1,89 +1,15 @@
-The Tamias game engine is divided into 2 sections:
-    Internal
-    API
+A file to document the api
+If you look within various parts of the source code, you will come across some 'weird' looking 'hackery', specifically `,',
+What this (`,',) does is that it does *not* evaluate whatever is there, but, rather, makes it so that you have to call eval on the piece of data to get the output of said data
+The reason why this is utilised in the engine is due to the fact that certain things (bounding-boxes for one) benefit from not having a value 'captured' due to a variety of things
+One of those things is the reliance upon an equation to determine the position of something (like a UI element) or the boundaries of something (like an entity's hitbox or the clickable area of an ui element), sometimes several parts are reliant on the positioning of something, so it needs to get the value of its parent (a button inside of a container) to be positioned correctly
 
-Internal is what is used by Tamias that the programmer shouldn't have to worry about or deal with
-The API is a series of functions, variables, structures, etc. that are to facilitate ease of game programming
-    A number of assumptions will be made, but these assumptions will be easy to work around, i.e. (draw-box ... ) draws a box with a default color of white
-      	     		    	    	      	    		     	     	     	     	  (draw-box ... :color +green+) draws a green box
-												  (draw-box ... :color '(127 127 127 255)) draws a grey box
-This document will first focus on the API, then will dive into the internal structure of the Tamias game engine, including a textual graph of what's going on.
-												  
-API
-(define-state state) example: (define-state title)
-(add-key key state key-state FUNCTION-BODY) Example: (add-key :z title :down (change-track heroic-song) (start-game))
-(add-to-state-render function-name state) Example: (add-to-state-render draw-title title)
-(define-state-render function-name state FUNCTION-BODY) example: @EXAMPLE
-(add-substate-function function-name state sub-state)
-(add-loop-function function-name state sub-state)
-(define-loop-function function-name state sub-state FUNCTION-BODY)
-(add-mouse mouse-button state mouse-state FUNCTION-BODY)
+A major thing to note is that I have focused on avoiding object oriented programming (or at least what everyone calls OOP) as much as possible
+Generics and methods are not directly implemented within Tamias. Some of the systems within Common LISP may make use of these, but I have not.
+If you have problems with the stances of anti-oop people, then take your complaints elsewhere.
+There is a focus on data-driven design and the rudimentary foundations of an Entity Component System (ECS) within Tamias. Inheritance is a great idea, so are methods, but when one has to continously rewrite code, what's the point?
+What can be achieved with a generic and a hundred methods can be achieved with a switch case
 
-Colors:
-+black+
-+white+
-+pastel-grey+
-+dark-pastel-grey+
-+pastel-dark-grey+
-
-+pastel-gray+
- +dark-pastel-gray+
- +pastel-dark-gray+
-
- +cream+
- +red+
- +dark-red+
- +green+
- +blue+
- +yellow+
- +pastel-red+
- +dark-pastel-red+
- +pastel-green+
- +pastel-blue+
- +pastel-yellow+
- +pastel-pink+
- +dark-pastel-pink+
-
- +aqua+
- +purple-jade+
- +cobalt+
- +yellow-zinc+
- +chalk-white+
- +brown+
- +natural-green+
- +dark-natural-green+
- +navy-blue+
- +steel-blue+
- +dark-steel-blue+
- +orange+
-
-
-INTERNAL
-init-input - initializes input on state definition (allows programmer to add keys, mouse buttons, etc.)
-
-Internal Textual Graph
-
-START
-HERE
-V
-(main)->initialize a random seed-> start sdl loop, initializing everything -> event-loop -> idle -> clear the screen -> game-loop -> check for music -> go through the current state's
-A     	       	      	       	     	       		    	       	A 	|    	      ^-------------------------------------------------<      rendering functions
-|    (load "compile.cl")						|	|-> key down -> process any keydown functions ------------>-----|    		|
-LISP REPL <----<----							|	|					      			| 		V
-		   |							|	|-> key up -> process any keyup functions ----------------->----|	Process any Logic
-		   |							|	|   	  	 			      			^		|
-	   Return to LISP REPL						|	|-> mouse button down -> Process mouse button down functions-->-|		V
-		   A							|	|   	  	 						|	show the rendered result
-		   |							|	|-> mouse button up -> Process mouse button up functions-->-----|       	|
-		Destroy Window						No	|								|		V
-		   A							|	|-> mouse motion -> process mouse motion functions-->-------->--^	Wait X amount of milliseconds
-		   |			Quit Audio<------------------ Exit?     									(1000 / X) = FPS
-		   |			     |				|	    		     							        |
-		Destroy renderer	     V				|											V
-		   A			go through each asset		|   										collect garbage
-		   |			and free any textures		|											|
-		   |			     |				----<-------<------<---------<-------<----------<---------<-----<----<--------<-----<---
-   		   <-free the font sheet-<---|
 +===============+
 |     Logic     |
 +===============+

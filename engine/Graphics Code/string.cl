@@ -49,74 +49,44 @@ On rendering strings, either use a ttf file and use a 'buffer' with the strings 
     (sdl2:free-rect tmp-rect)
     ))
 
-(defun create-text-buffer (string &key (width 256) (height 256) to-texture (buffer-source 'array))
+(defun create-text-buffer (string &key (width 256) (height 256) to-surface);;yeah, this needs to be changed significantly
+  ;;some of the code below, that will be gone by the time somebody else reads this, was being used for a rogue-like I was developing
+  ;;or rather still developing, but not very much has been developed for a while
   (let ((buff (sdl2:create-rgb-surface width height 32))
 	(cell-row 0)
 	(cell-column 0)
 	(mod-x -1)
 	(mod-y 0)
 	(texture nil)
-	(temp-value 0)
 	(x 0)
 	(y 0))
     (loop for n below (length string)
        do (setf (values cell-row cell-column) (truncate (char-code (aref string n)) 16))
-       ;;In order to display the text-strings correctly, the code must check for a newline character before n and use that for the divisor,
-       ;;or use the position of #\Newline if there is no newline character before n
 	 (if (find #\NewLine string)
-	     (case buffer-source
-	       (array (setf (values mod-y mod-x) (truncate n (1+ (position #\Newline string)))))
-	       (text (incf mod-x 1)
-		     (incf temp-value 1)
-		     (if (eq (aref string n) #\NewLine)
-			 (progn (setf mod-x -1)
-				(incf mod-y 1)
-				(setf temp-value 0))
-			 (if (and (eq (mod temp-value (/ width (car character-size))) 0)
-				  (> mod-x 0))
-			     (progn (setf mod-x 0)
-				    (incf mod-y 1)
-				    (setf temp-value 0))))))
-	     (if (eq buffer-source 'text)
-		 (progn (incf mod-x 1)
-			(if (and (eq (mod n (/ width (car character-size))) 0)
-				 (> mod-x 0))
-			    (progn (setf mod-x 0)
-				   (incf mod-y 1))))
-		 (setf (values mod-y mod-x) (truncate n (length string)))))
-	 (if (not (eq (char string n) #\NewLine))
-	     (let ((color (case (aref string n)
-			    (#\w (list 10 10 200))
-			    (#\O (list 66 34 10))
-			    (#\# (list 126 94 60))
-			    (#\. (list 16 60 17))
-			    (otherwise (list 255 255 255)))))
-	       (if (eq buffer-source 'array)
-		   (if (not (eq (char string n) #\0))
-		       (render-character-to-buffer (list cell-row cell-column)
-						   (+ x (* mod-x (car character-size)))
-						   (+ y (* mod-y (cadr character-size)))
-						   buff
-						   :color color))
-		   (render-character-to-buffer (list cell-row cell-column)
-					       (+ x (* mod-x (car character-size)))
-					       (+ y (* mod-y (cadr character-size)))
-					       buff
-					       :color (list 255 255 255 255)))
-	       )))
+	      (setf (values mod-y mod-x) (truncate n (1+ (position #\Newline string)))))
+	 (incf mod-x 1)
+	 (if (and (eq (mod n (/ width (car character-size))) 0)
+		  (> mod-x 0))
+	     (progn (setf mod-x 0)
+		    (incf mod-y 1)))
+	 (render-character-to-buffer (list cell-row cell-column)
+				     (+ x (* mod-x (car character-size)))
+				     (+ y (* mod-y (cadr character-size)))
+				     buff
+				     :color (list 255 255 255)))
     (sdl2:set-color-key buff 1 0)
-    (if to-texture
+    (if to-surface
+	buff
 	(progn (setf texture (sdl2:create-texture-from-surface renderer buff))
 	       (sdl2:free-surface buff)
 	       (setf buff nil)
-	       texture)
-	buff)))
+	       texture))))
 
 (defun font-to-surface (font)
   ;;to be implemented: making ttf fonts easier and better to use
   ;;Idea: loop through each ascii character (loop for char below 256) and push the rendered character to a surface that is then used as the font-sheet for the program
   )
-
+;;this will need to be updated to support utf-8
 
 (defmacro delimit-inclusive (limiter str &key (modifier 0))
   `(if (characterp ,limiter)

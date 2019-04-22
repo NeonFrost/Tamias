@@ -5,14 +5,14 @@
   (transition t)
   (render-list '()))
 
-(defmacro start-input (state)
+(defmacro init-input (state)
   `(setf (gethash :down (state-keys ,state)) (make-hash-table)
 	 (gethash :up (state-keys ,state)) (make-hash-table)
 	 (gethash :down (state-mouse ,state)) (make-hash-table)
 	 (gethash :up (state-mouse ,state)) (make-hash-table)))
 (defmacro define-state (state)
   `(progn (defvar ,state (make-state))
-	  (start-input ,state)))
+	  (init-input ,state)))
 
 (defmacro add-to-state-render (function-name state)
   `(setf (state-render-list ,state) (append (state-render-list ,state) (list (quote ,function-name)))))

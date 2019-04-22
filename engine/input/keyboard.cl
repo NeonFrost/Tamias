@@ -1,3 +1,7 @@
+(defvar current-text-context "")
+(defvar *current-text-position* 0)
+(defvar *text-input-state* nil)
+
 (defstruct modifier-states
   control
   shift
@@ -51,9 +55,9 @@
 (defun keydown-check (key)
   ;;switch to (sym-value keysym)
   (case key
-    ((or :scancode-lctrl :scancode-rctrl) (setf (modifier-states-control modifier-states) t))
-    ((or :scancode-lshift :scancode-rshift) (setf (modifier-states-shift modifier-states) t))
-    ((or :scancode-lalt :scancode-ralt) (setf (modifier-states-meta modifier-states) t))
+    ((:scancode-lctrl :scancode-rctrl) (setf (modifier-states-control modifier-states) t))
+    ((:scancode-lshift :scancode-rshift) (setf (modifier-states-shift modifier-states) t))
+    ((:scancode-lalt :scancode-ralt) (setf (modifier-states-meta modifier-states) t))
     (:scancode-return (if *text-input-state*
 			  (progn (setf current-text-context (with-output-to-string (stream)
 							      (if (< *current-text-position* (length current-text-context))
@@ -91,17 +95,15 @@
 
 (defun keyup-check (key)
   (case key
-    ((or :scancode-lctrl :scancode-rctrl) (setf (modifier-states-control modifier-states) nil))
-    ((or :scancode-lshift :scancode-rshift) (setf (modifier-states-shift modifier-states) nil))
-    ((or :scancode-lalt :scancode-ralt) (setf (modifier-states-meta modifier-states) nil))
+    ((:scancode-lctrl :scancode-rctrl) (setf (modifier-states-control modifier-states) nil))
+    ((:scancode-lshift :scancode-rshift) (setf (modifier-states-shift modifier-states) nil))
+    ((:scancode-lalt :scancode-ralt) (setf (modifier-states-meta modifier-states) nil))
     )
   (if (gethash key (gethash :up (state-keys (eval state))))
       (loop for func in (gethash key (gethash :up (state-keys (eval state))))
 	 do (eval func))))
 
-(defvar current-text-context "")
-(defvar *current-text-position* 0)
-(defvar *text-input-state* nil)
+
 (defun handle-text-input (text)
   (let ((text (ascii-to-string text)))
     (setf current-text-context (with-output-to-string (stream)
