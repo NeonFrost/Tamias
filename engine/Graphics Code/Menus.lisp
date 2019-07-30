@@ -17,10 +17,10 @@
 			       (menu-width menu) (menu-height menu)))
 	(border-color (menu-border-color menu))
 	(fill-color (menu-fill-color menu)))
-    (sdl2:set-render-draw-color renderer (car border-color) (cadr border-color) (caddr border-color) (cadddr border-color))
-    (sdl2:render-fill-rect renderer rect1)
-    (sdl2:set-render-draw-color renderer (car fill-color) (cadr fill-color) (caddr fill-color) (cadddr fill-color))
-    (sdl2:render-fill-rect renderer rect2)
+    (sdl2:set-render-draw-color tamias:renderer (car border-color) (cadr border-color) (caddr border-color) (cadddr border-color))
+    (sdl2:render-fill-rect tamias:renderer rect1)
+    (sdl2:set-render-draw-color tamias:renderer (car fill-color) (cadr fill-color) (caddr fill-color) (cadddr fill-color))
+    (sdl2:render-fill-rect tamias:renderer rect2)
     (sdl2:free-rect rect1)
     (sdl2:free-rect rect2)))
 
@@ -40,9 +40,9 @@
 	do (funcall menu (eval menu)))))
 
 (defun update-window-size ()
-  (setf *screen-width* (car (nth resolution resolution-list))
-	*screen-height* (cadr (nth resolution resolution-list)))
-  (sdl2:set-window-size default-window *screen-width* *screen-height*)
+  (setf tamias:screen-width (car (nth tamias:resolution tamias:resolution-list))
+	tamias:screen-height (cadr (nth tamias:resolution tamias:resolution-list)))
+  (sdl2:set-window-size tamias:default-window tamias:screen-width tamias:screen-height)
   (loop for menu in **tamias-menus**
      do (setf (menu-x menu) (+ (eval (menu-x-equation menu)) 6)
 	      (menu-y menu) (+ (eval (menu-y-equation menu)) 6)

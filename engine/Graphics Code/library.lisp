@@ -8,17 +8,17 @@
 	(g (cadr color))
 	(b (caddr color))
 	(a (cadddr color)))
-    (sdl2:set-render-draw-color renderer r g b a)
-    (sdl2:render-draw-line renderer x y x2 y2)))
+    (sdl2:set-render-draw-color tamias:renderer r g b a)
+    (sdl2:render-draw-line tamias:renderer x y x2 y2)))
 
 (defmacro define-buffer (buffer)
   `(progn (defvar ,buffer nil)
-	  (push ,buffer buffers)))
+	  (push ,buffer tamias:buffers)))
 
 (defun create-texture (&key (format sdl2:+pixelformat-rgba8888+) (access 0) (width 16) (height 16) (color +white+))
-  (sdl2:set-render-draw-color renderer (car color) (cadr color) (caddr color) (cadddr color))
-  (sdl2:render-clear renderer)
-  (sdl2:create-texture renderer format access width height))
+  (sdl2:set-render-draw-color tamias:renderer (car color) (cadr color) (caddr color) (cadddr color))
+  (sdl2:render-clear tamias:renderer)
+  (sdl2:create-texture tamias:renderer format access width height))
 
 (defmacro with-rectangle (name rect &body body)
   `(let ((,name (sdl2:make-rect (car ,rect)
@@ -42,7 +42,7 @@
 	  
 	  (if (not ,src)
 	      (let ((src (sdl2:make-rect 0 0 (sdl2:texture-width ,tex) (sdl2:texture-height ,tex))))
-		(sdl2:render-copy-ex renderer
+		(sdl2:render-copy-ex tamias:renderer
 				     ,tex
 				     :source-rect src
 				     :dest-rect ,dest
@@ -51,7 +51,7 @@
 				     :flip (list ,flip))
 		(sdl2:free-rect src)
 		(sdl2:free-rect ,dest))
-	      (progn (sdl2:render-copy-ex renderer
+	      (progn (sdl2:render-copy-ex tamias:renderer
 					  ,tex
 					  :source-rect ,src
 					  :dest-rect ,dest
@@ -70,10 +70,10 @@
 		255))
 	 (rect (sdl2:make-rect x y w h))) ;; I still want to figure out a way to better manage memory with Tamias, currently, a rectangle is made and then freed every frame
     ;;set the render draw color to the color
-    (sdl2:set-render-draw-color renderer r g b a)
+    (sdl2:set-render-draw-color tamias:renderer r g b a)
     (if filled
-	(sdl2:render-fill-rect renderer rect) ;;fills the area of x -> w and y -> h with color (default white)
-	(sdl2:render-draw-rect renderer rect)) ;;draws 4 lines, x -> , x -> w, y -> w, h -> w with color (default white)
+	(sdl2:render-fill-rect tamias:renderer rect) ;;fills the area of x -> w and y -> h with color (default white)
+	(sdl2:render-draw-rect tamias:renderer rect)) ;;draws 4 lines, x -> , x -> w, y -> w, h -> w with color (default white)
     (sdl2:free-rect rect))) ;;frees memory taken up by the rect. Not doing this will cause a segfault
 
 (defun render-rectangle (x y w h &key (color '(255 255 255 255)) filled)
@@ -112,7 +112,7 @@
 			      (- (menu-width menu) 8)
 			      (- (menu-height menu) 8)
 			      )))
-    (sdl2:render-copy renderer
+    (sdl2:render-copy tamias:renderer
 		      buffer
 		      :source-rect src				    
 		      :dest-rect dest)
@@ -135,7 +135,7 @@
       (list 0 0)))
 
 
-(defun render-string (str x y &key width height dest-width dest-height (rotate 0) (color current-font-color) anti-alias)
+(defun render-string (str x y &key width height dest-width dest-height (rotate 0) (color tamias:font-color) anti-alias)
   (let ((w (or width
 	       (if (find #\newline str)
 		   (* (position #\newline str) (car character-size)))
@@ -189,7 +189,7 @@
 			  :angle rotate)))
 	  (reset-text-buffer string-buffer)))))
 
-(defun render-text (str x y &key width height dest-width dest-height (rotate 0) (color current-font-color) scale)
+(defun render-text (str x y &key width height dest-width dest-height (rotate 0) (color tamias:font-color) scale)
   (if scale
       (let ((w (or width
 		   (if (find #\newline str)
@@ -281,7 +281,7 @@ old text-buffer code
 
 
 (defmacro optimize-sheet (var)
-  `(setf (sprite-sheet-texture ,var) (sdl2:create-texture-from-surface renderer (sprite-sheet-surface ,var))))
+  `(setf (sprite-sheet-texture ,var) (sdl2:create-texture-from-surface tamias:renderer (sprite-sheet-surface ,var))))
 
 (defmacro set-sheet-width (sheet width)
   `(setf (sprite-sheet-width ,sheet) ,width))
@@ -384,15 +384,15 @@ old text-buffer code
 (defvar fg-palette (nth 0 palette))
 (defvar bg-palette (nth 1 palette))
 (defvar font-palette (nth 2 palette))
-(setf current-font-color font-palette)
-(setf tamias-renderer-clear-color (nth 3 palette))
+(setf tamias:font-color font-palette)
+(setf tamias:render-clear-color (nth 3 palette))
 
 (defun update-palette ()
   (setf fg-palette (nth 0 palette)
 	bg-palette (nth 1 palette)
 	font-palette (nth 2 palette)
-	current-font-color font-palette
-	tamias-renderer-clear-color (nth 3 palette)))
+	tamias:font-color font-palette
+	tamias:render-clear-color (nth 3 palette)))
 (defmacro change-palette (var)
   `(let ((fg (nth 0 ,var))
 	 (bg (nth 1 ,var))

@@ -1,7 +1,6 @@
 #|
 On rendering strings, either use a ttf file and use a 'buffer' with the strings (rendering a string through sdl-ttf requires many calculations and procedures to take place, resulting in /massive/ slowdown if done every frame update) or use a tile sheet with 256 characters on it, take the ascii character code of each character of the string (i.e. a = 58), divide by 16, with the quotient being used for the row and the remainder being used for the column (60/16 = 3 12/16 = R:3 C:12) cell and then render it to either a buffer (recommended) or to the renderer
 |#
-(defvar +font-sheet+ nil)
 (defvar character-size '(16 16))
 
 (defun ascii-to-string (code)
@@ -40,7 +39,7 @@ On rendering strings, either use a ttf file and use a 'buffer' with the strings 
 				   (cadr character-size)))
 	(temporary-surface (sdl2:create-rgb-surface (car character-size) (cadr character-size) 32))
 	(tmp-rect (sdl2:make-rect 0 0 (car character-size) (cadr character-size))))
-    (blit +font-sheet+ src-rect temporary-surface tmp-rect)
+    (blit tamias:font src-rect temporary-surface tmp-rect)
     (sdl2:set-color-mod temporary-surface (car color) (cadr color) (caddr color))
     (blit temporary-surface tmp-rect buffer dest-rect)
     (sdl2:free-surface temporary-surface)
@@ -77,7 +76,7 @@ On rendering strings, either use a ttf file and use a 'buffer' with the strings 
     (sdl2:set-color-key buff 1 0)
     (if to-surface
 	buff
-	(progn (setf texture (sdl2:create-texture-from-surface renderer buff))
+	(progn (setf texture (sdl2:create-texture-from-surface tamias:renderer buff))
 	       (sdl2:free-surface buff)
 	       (setf buff nil)
 	       texture))))

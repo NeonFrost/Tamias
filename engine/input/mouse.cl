@@ -3,8 +3,8 @@
 		  (1 :button-left)
 		  (2 :button-middle)
 		  (3 :button-right))))
-    (if (gethash button (gethash :down (state-mouse (eval state))))
-	(loop for func in (gethash button (gethash :down (state-mouse (eval state))))
+    (if (gethash button (gethash :down (state-mouse (eval tamias:state))))
+	(loop for func in (gethash button (gethash :down (state-mouse (eval tamias:state))))
 	   do (eval func)))))
 
 (defun mouse-button-release-check (button)
@@ -12,8 +12,8 @@
 		  (1 :button-left)
 		  (2 :button-middle)
 		  (3 :button-right))))
-    (if (gethash button (gethash :up (state-mouse (eval state))))
-	(loop for func in (gethash button (gethash :up (state-mouse (eval state))))
+    (if (gethash button (gethash :up (state-mouse (eval tamias:state))))
+	(loop for func in (gethash button (gethash :up (state-mouse (eval tamias:state))))
 	   do (eval func)))))
 (defvar *mouse-x* 0)
 (defvar *mouse-y* 0)
@@ -24,6 +24,6 @@
 	*mouse-y* y
 	*mouse-velocity-x* xrel
 	*mouse-velocity-y* yrel) 
-  (if (gethash :move (state-mouse (eval state)))
-      (loop for func in (gethash :move (state-mouse (eval state)))
+  (if (gethash :move (state-mouse (eval tamias:state)))
+      (loop for func in (gethash :move (state-mouse (eval tamias:state)))
 	   do (eval func))))

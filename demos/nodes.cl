@@ -167,6 +167,6 @@
 						      (setf canvas-x-relation *mouse-x*
 							    canvas-y-relation *mouse-y*))))))
 					       
-(add-key :scancode-a *node-editor* :down (if (not *text-input-state*)
+(add-key :a *node-editor* :down (if (not *text-input-state*)
 					     (define-node :x *mouse-x*
 					       :y *mouse-y*)))

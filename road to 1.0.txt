@@ -12,8 +12,8 @@ Demos - Rendering
 
 Input:
 Keyboard focus until 0.9, where rudimentary controller support will be added
-DONE: Move from :scancode-KEY to :KEY
 better mouse support
+DONE: Move from :scancode-KEY to :KEY
 FIXED: check with os to see if mod keys are being used rather than left/right modkeys (I have the caps lock key acting as a control key and it doesn't
        	      	     	    	     	   	       	    	       	        register as control.)
 
@@ -27,9 +27,11 @@ Fix image fonts, implement ttf support - IN PROGRESS
 Audio:
 Refactor and fix music subsystem (currently not broken, but feels like it needs work.)
 make it easier to do stuff with music files
-implement ability to use multiple extensions (mp3 et al) - CAN'T FIX - As far as I can tell, when sdl mixer is loaded up, it can only handle {ext} and wav files,
-	  	     	 	  	     	     	   	       	      	       	     	      	       	      	  ext for music wav for sound
+
 Ensure sfx are easy to use
+
+CANT-FIX: implement ability to use multiple extensions (mp3 et al) - As far as I can tell, when sdl mixer is loaded up, it can only handle {ext} and wav files,
+	  	     	 	  	     	     	   	       	      	       	     	      	       	      	  ext for music wav for sound
 
 OS:
 Unsure, probably make save files easy to implement (i.e. (save-game "name.EXT" things to save) (load-save-game "file.ext")

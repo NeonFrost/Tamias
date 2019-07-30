@@ -20,8 +20,8 @@ this particle has no name, it is part of a particles list
 	 (g (cadr ,color))
 	 (b (caddr ,color))
 	 (a (cadddr ,color)))
-     (sdl2:set-render-draw-color renderer r g b a)
-     (sdl2:render-fill-rect renderer ,rect)))
+     (sdl2:set-render-draw-color tamias:renderer r g b a)
+     (sdl2:render-fill-rect tamias:renderer ,rect)))
 
 (defmacro create-particle (vector size duration color particles)
   `(push-particle (make-particle :vector ,vector :size ,size :duration ,duration :color ,color) ,particles))

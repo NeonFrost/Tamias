@@ -1,0 +1,43 @@
+Decide on what it is, i.e. Demo, Video, etc.
+Add a loop function for the splash screen state, checking to see if tamias:key-pressed is t
+If so, have it go through the process of going to the title screen (or main menu or even the main game, it's your choice, really)
+Have a timer set up for this state that after x seconds, it goes to the title screen (or whichever state you choose)
+
+Example function:
+(defun check-splash ()
+       (if tamias:key-pressed
+       	   (setf transition t)
+	   (incf splash-state-timer 1))
+       (if (>= splash-state-timer (* 90 fps)) ;;90 seconds mult fps gets required number of 'ticks' to activate this condition
+           (setf transition t)))
+(add-to-state-loops splash-screen :top check-splash)
+;;some kind of rendering function
+
+TITLE SCREEN
+
+Same thing if you're just checking for a key to go to the Main Menu
+Rendering wise, Use a still image with either semi-rapidly "glowing" text (from opaque to semi-transparent and back (100% -> 50% -> 100%)) or Blinking text
+For glowing text, on input, blink the text (and possibly trigger a sound)
+
+glowing text:
+(defvar glow-trans 255)
+(defvar glow-trans-state 'trans)
+(defun glow-text ()
+       (render-text "Press Any Button" x y :color (list (car font-color) (cadr font-color) (caddr font-color) glow-trans))
+       (case glow-trans-state
+         (trans (decf glow-trans 3)
+	 	(if (<= glow-trans 127)
+		    (setf glow-trans-state 'opaque)))
+         (opaque (incf glow-trans 3)
+	 	 (if (>= glow-trans 253)
+		    (setf glow-trans-state 'trans)))))
+       
+blinking text:
+(defvar blink-timer 0)
+(defvar blink-trans 255)
+(defun blink-text ()
+       (render-text "Press Any Button" x y :color (list r g b blink-trans))
+       (if (>= blink-timer 8) ;; 8 frames
+           (if (> blink-trans 0)
+	       (setf blink-trans 0)
+	       (setf blink-trans 255))))

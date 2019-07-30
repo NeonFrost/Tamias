@@ -1,12 +1,12 @@
 (defun process-loop ()
-  (loop for func in (gethash sub-state (state-loops (eval state)))
+  (loop for func in (gethash tamias:sub-state (state-loops (eval tamias:state)))
      do (funcall func))
   )
 
 (defun pause-game ()
-  (setf state 'paused)
+  (setf tamias:state 'paused)
   (pause-music))
 
 (defun resume-game ()
-  (setf state 'level)
+  (setf tamias:state 'level)
   (resume-music))

@@ -5,6 +5,9 @@
   (transition t)
   (render-list '()))
 
+(defmacro set-state (state)
+  `(setf tamias:state ,state))
+
 (defmacro init-input (state)
   `(setf (gethash :down (state-keys ,state)) (make-hash-table)
 	 (gethash :up (state-keys ,state)) (make-hash-table)

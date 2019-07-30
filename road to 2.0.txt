@@ -1,0 +1,18 @@
+Get to 1.0
+Convert Tamias source code over to Elk
+1.5
+Implement 3D backend
+1.7
+Audio server written in Elk, replacing SDL mixer
+1.9
+An extensible roguelike will be written
+2.0
+An extensible zelda-clone will be written
+
+3.0 roadmap
+All backends written in native Elk as much as possible (i.e. audio server on top of ALSA, gfx on top of X)
+
+At least 2 3D games written along with several 3D demos (one voxel demo, one that heavily uses particles)
+
+One full fledged 3D game (not necessarily visually stunning) written and released
+

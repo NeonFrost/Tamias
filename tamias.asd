@@ -10,8 +10,8 @@
   :depends-on (:sdl2
 	       :sdl2-image
 	       :sdl2-mixer)
-  :components ((:file "states" :type "cl")
-	       (:file "values" :type "cl")
+  :components ((:file "values" :type "cl")
+	       (:file "states" :type "cl")
 	       (:module "engine"
 			:serial t
 			:components
@@ -28,7 +28,7 @@
 				  ((:file "entities" :type "cl")
 				   (:file "vectors")
 				   (:file "math" :type "cl")
-				   (:file "move-platformer" :type "cl")
+				   ;;(:file "move-platformer" :type "cl") ;;I uh, I don't know. 
 				   (:file "2D-particles")
 				   #|(:modlue "Physics"
 				   :serial t

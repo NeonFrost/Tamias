@@ -31,10 +31,10 @@
   )
 (add-to-state-render render-ui sci-fi)
 
-(add-key :scancode-down sci-fi :down (if (< selector 6)
+(add-key :down sci-fi :down (if (< selector 6)
 					 (incf selector 1)
 					 (setf selector 0)))
-(add-key :scancode-up sci-fi :down (if (> selector 0)
+(add-key :up sci-fi :down (if (> selector 0)
 				       (decf selector 1)
 				       (setf selector 6)))
 

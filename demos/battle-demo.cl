@@ -66,5 +66,5 @@
 (defun dec-hp ()
   (if (> (entity-hp monster) 1)
       (decf (entity-hp monster) 1)))
-(add-key :scancode-u battle :down (dec-hp))
-(add-key :scancode-h battle :down (inc-hp))
+(add-key :u battle :down (dec-hp))
+(add-key :h battle :down (inc-hp))

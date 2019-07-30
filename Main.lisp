@@ -12,32 +12,35 @@ starting sequence
 )|#
 
 (defun init ()
-  (setf +font-sheet+ (sdl2-image:load-image "engine/Graphics Code/font.png"))
+  (setf tamias:font (sdl2-image:load-image "engine/Graphics Code/font.png"))
   ;;skeleton code
   (initialize-assets))
+
+(defmacro fps (target)
+  `(progn (setf tamias:fps ,target)
+	  (setf tamias:update-time (round (/ 1000 ,target)))))
 
 (defun main ()
   (make-random-state)
   (sdl2:with-init (:everything)
-    (setf default-window (sdl2:create-window :title game-title
-					     :w (car (nth resolution resolution-list))
-					     :h (cadr (nth resolution resolution-list))
+    (setf tamias:default-window (sdl2:create-window :title tamias:game-title
+					     :w (car (nth tamias:resolution tamias:resolution-list))
+					     :h (cadr (nth tamias:resolution tamias:resolution-list))
 					     :flags '(:shown)))
-    (sdl2:with-renderer (default-renderer default-window :flags '(:accelerated))
+    (sdl2:with-renderer (default-renderer tamias:default-window :flags '(:accelerated))
       ;;add in conditional after Oreortyx is finished, ie (if not probe-file oreortyx, blah blah)
       (sdl2-mixer:init :ogg)
       (sdl2-mixer:open-audio 44100 :s16sys 2 1024)
-      (setf renderer (sdl2:get-renderer default-window))
+      (setf tamias:renderer (sdl2:get-renderer tamias:default-window))
       (init)
-      (sdl2:set-render-draw-blend-mode renderer 1)
+      (sdl2:set-render-draw-blend-mode tamias:renderer 1)
       (update-window-size)
       (sdl2:stop-text-input)
       (sdl2:with-event-loop (:method :poll)
 	(:keydown (:keysym keysym)
-		  ;;switch to (sym-value keysym)
-		  (keydown-check (sdl2:scancode keysym)))
+		  (keydown-check (sdl2:get-key-name (sdl2:sym-value keysym))))
 	(:keyup (:keysym keysym)
-		(keyup-check (sdl2:scancode keysym)))
+		(keyup-check (sdl2:get-key-name (sdl2:sym-value keysym))))
 	(:mousebuttondown (:button m-button)
 			  (mouse-button-check m-button))
 	(:mousebuttonup (:button m-button)
@@ -52,33 +55,33 @@ starting sequence
 	(:quit ()
 	       (quit-audio)
 	       (kill-textures)
-	       (sdl2:destroy-renderer renderer)
-	       (sdl2:destroy-window default-window)
+	       (sdl2:destroy-renderer tamias:renderer)
+	       (sdl2:destroy-window tamias:default-window)
 	       t)))))
 
 (defun primary-loop ()
-  (sdl2:set-render-draw-color renderer (car tamias-renderer-clear-color) (cadr tamias-renderer-clear-color) (caddr tamias-renderer-clear-color) 255)
-  (sdl2:render-clear renderer)
+  (sdl2:set-render-draw-color tamias:renderer (car tamias:render-clear-color) (cadr tamias:render-clear-color) (caddr tamias:render-clear-color) 255)
+  (sdl2:render-clear tamias:renderer)
   (game-loop)
-  (sdl2:render-present renderer)
-  (sdl2:delay *tamias-update-time*))
+  (sdl2:render-present tamias:renderer)
+  (sdl2:delay tamias:update-time))
 
 (defun game-loop ()
   (test-music)
   (render-state)
-  (if changing-state
+  (if tamias:changing-state
       (process-changing-state))
   (process-loop))
 
 (defun kill-textures ()
-  (setf buffers nil)
+  (setf tamias:buffers nil)
   (loop for **asset** in **tamias-assets**
      do (case (cadr **asset**)
 	  ((image texture) (sdl2:destroy-texture (eval (car **asset**))))
 	  ((sprite-sheeet tile-sheet) (free-sheet (eval (car **asset**))))))
-  (if +font-sheet+
-      (progn (sdl2:free-surface +font-sheet+)
-	     (setf +font-sheet+ nil))))
+  (if tamias:font
+      (progn (sdl2:free-surface tamias:font)
+	     (setf tamias:font nil))))
 
 (defun create-exec (&key linking (name "main") (system :tamias))
   (if (not name)

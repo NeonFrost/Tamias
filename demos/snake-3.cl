@@ -81,10 +81,10 @@
 	(otherwise (setf current-direction lst))))
   (setf key-processing? t))
   
-(add-key :scancode-up snake :down (set-cur-dir '(0 -1 u)))
-(add-key :scancode-left snake :down (set-cur-dir '(-1 0 l)))
-(add-key :scancode-right snake :down (set-cur-dir '(1 0 r)))
-(add-key :scancode-down snake :down (set-cur-dir '(0 1 d)))
+(add-key :up snake :down (set-cur-dir '(0 -1 u)))
+(add-key :left snake :down (set-cur-dir '(-1 0 l)))
+(add-key :right snake :down (set-cur-dir '(1 0 r)))
+(add-key :down snake :down (set-cur-dir '(0 1 d)))
 
 #|
 (defun move ()
@@ -172,7 +172,7 @@
 	       (setf current-direction lst)))
 	(d (if (not (eq (nth 3 lst) 'u))
 		 (setf current-direction lst))))))
-(add-key :scancode-up snake :down (set-cur-dir '(0 -1 t u)))
-(add-key :scancode-left snake :down (set-cur-dir '(-1 0 t l)))
-(add-key :scancode-right snake :down (set-cur-dir '(1 0 t r)))
-(add-key :scancode-down snake :down (set-cur-dir '(0 1 t d)))|#
+(add-key :up snake :down (set-cur-dir '(0 -1 t u)))
+(add-key :left snake :down (set-cur-dir '(-1 0 t l)))
+(add-key :right snake :down (set-cur-dir '(1 0 t r)))
+(add-key :down snake :down (set-cur-dir '(0 1 t d)))|#

@@ -27,12 +27,12 @@
       (setf nika-current-cell (- (* dir 8) 8))))
 (add-loop-function increase-cell animation 'top)
 
-(add-key :scancode-down animation :down (setf dir 1
+(add-key :down animation :down (setf dir 1
 					      nika-current-cell (- (* dir 8) 8)))
-(add-key :scancode-up animation :down (setf dir 2
+(add-key :up animation :down (setf dir 2
 					    nika-current-cell (- (* dir 8) 8)))
-(add-key :scancode-right animation :down (setf dir 3
+(add-key :right animation :down (setf dir 3
 					       nika-current-cell (- (* dir 8) 8)))
-(add-key :scancode-left animation :down (setf dir 4
+(add-key :left animation :down (setf dir 4
 					      nika-current-cell (- (* dir 8) 8)))
 
