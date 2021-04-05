@@ -1,0 +1,6 @@
+CL = common lisp file
+V = vertex shader
+F = fragment shader
+TJA = Tamias Joint Animation
+T3DA = Tamias 3D Animation [combination of OBJ and TJA]
+W3DS = canis (Wolf) 3D Scene (to be implemented.)

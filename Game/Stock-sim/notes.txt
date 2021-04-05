@@ -1,0 +1,14 @@
+Stock sim will simulate stock trading
+
+Necessities:
+
+Must be able to organize by column
+
+| Name | Ticker | Price | Change |
+
+Once one of the columns is clicked, it reorders the stock list to display by whatever category was clicked
+
+Name/ticker - A->Z, if already organized by Name/Ticker, Z->A
+Price/Change - Low to high, if already, High to low
+
+Clicking on a row highlights that row

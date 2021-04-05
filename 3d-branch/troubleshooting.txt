@@ -1,0 +1,3 @@
+"My mesh looks like a being from the spikes dimension"
+Make sure you've triangulated your meshes/objects. I'll look into if processing quadrilaterals and triangles is significantly slower than just triangles.
+If there's a difference of, say, .00012 seconds when processing 1 million polys, then I'll add it in. If there's a difference of .00012 when processing 1000, then I won't

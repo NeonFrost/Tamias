@@ -1,0 +1,506 @@
+#|
+This will be a library for the: creation, transformation, translation and [pending further] of vertexes.
+|#
+
+#|
+File zipping idea
+Zip for games:
+Data structure of N size:
+Num-of-files (16 bytes)
+file-points or file-offsets (128 bytes per entry, 0x00000000 . 0x00f3a59e)
+|#
+
+#|
+(defstruct vertex
+  (spatial (make-array '(3) :initial-contents '(0.0 0.0 0.0)))
+  (normal (make-array '(3) :initial-contents '(0.0 0.0 0.0)))
+  (uv (make-array '(2) :initial-contents '(0.0 0.0))))
+  )
+
+(defmacro vertex-x (vertice)
+  `(aref (vertex-spatial ,vertice) 0))
+(defmacro vertex-y (vertice)
+  `(aref (vertex-spatial ,vertice) 1))
+(defmacro vertex-z (vertice)
+  `(aref (vertex-spatial ,vertice) 2))
+(defmacro vertex-normal-x (vertice)
+  `(aref (vertex-normal ,vertice) 0))
+(defmacro vertex-normal-y (vertice)
+  `(aref (vertex-normal ,vertice) 1))
+(defmacro vertex-normal-z (vertice)
+  `(aref (vertex-normal ,vertice) 2))
+(defmacro vertex-tc-u (vertice)
+  `(aref (vertex-uv ,vertice) 0))
+(defmacro vertex-tc-v (vertice)
+  `(aref (vertex-uv ,vertice) 1))
+
+(defmacro make-vertice (&key (x 0.0) (y 0.0) (z 0.0) (xn 0.0) (yn 0.0) (zn 0.0) (u 0.0) (v 0.0))
+  `(make-vertex :spatial (make-array '(3) :initial-contents (,x ,y ,z))
+		:normal (make-array '(3) :initial-contents (,xn ,yn, zn))
+		:uv (make-array '(2) :initial-contents (,u ,v))))
+|#
+#|
+Id system:
+(defvar [component]-id 0)
+(defvar [component]-array nil)
+(defvar [component]-assoc-list nil)
+(defstruct material
+  (name "")
+  (id 0)
+  (material-slots [specular, color, etc.])
+  )
+create-new-material -> incf material-id, add material to mat list, repeat
+once all materials are created, setf 
+
+Oh good lord
+
+For the game engine, there won't be an associative list
+however it is structured as:
+("Nika_mat" 0 "boom_mat" 1 ... "fin_mat" 25)
+
+|#
+
+
+#|
+(defstruct spatial-vertex
+  (coordinates (make-array '(3) :initial-contents '(0.0 0.0 0.0))))
+(defstruct normal-vertex
+  (coordinates (make-array '(3) :initial-contents '(0.0 0.0 0.0))))
+(defstruct texture-vertex
+  (coordinates (make-array '(2) :initial-contents '(0.0 0.0))))
+
+(defmacro vertex-x (vertice)
+  `(aref (spatial-vertex-coordinates ,vertice) 0))
+(defmacro vertex-y (vertice)
+  `(aref (spatial-vertex-coordinates ,vertice) 1))
+(defmacro vertex-z (vertice)
+  `(aref (spatial-vertex-coordinates ,vertice) 2))
+(defmacro normal-vertex-x (vertice)
+  `(aref (normal-vertex-coordinates ,vertice) 0))
+(defmacro normal-vertex-y (vertice)
+  `(aref (normal-vertex-coordinates ,vertice) 1))
+(defmacro normal-vertex-z (vertice)
+  `(aref (normal-vertex-coordinates ,vertice) 2))
+(defmacro texture-vertex-u (vertice)
+  `(aref (texture-vertex-coordinates ,vertice) 0))
+(defmacro texture-vertex-v (vertice)
+  `(aref (texture-vertex-coordinates ,vertice) 1))
+
+(defstruct point
+  (spatial-vertex 0)
+  (normal-vertex nil)
+  (texture-vertex nil))|#
+
+#|
+from a file
+
+(make-object :vertices (make-array (list (length file-vertices)) :initial-contents file-vertices)
+	     :polygons (make-array (list (length file-polygons)) :initial-contents file-polygons))
+
+|#
+
+#|
+(defstruct vertex
+  (x 0.0)
+  (y 0.0)
+  (z 0.0))
+
+(defstruct normal-vertex
+  (x 0.0)
+  (y 0.0)
+  (z 0.0))
+
+(defstruct uv-vert
+   )
+
+(defstruct polygon
+  (a nil)
+  (b nil)
+  (c nil)
+  (normal nil))
+
+(defstruct obj-material
+  name)
+|#
+(defun calculate-normal (polygon)
+  (let ((normal-vector (make-array '(3) :initial-contents '(0.0 0.0 0.0)))
+	(un (list (- (vertex-x (polygon-b polygon)) (vertex-x (polygon-a polygon)))
+		  (- (vertex-y (polygon-b polygon)) (vertex-y (polygon-a polygon)))
+		  (- (vertex-z (polygon-b polygon)) (vertex-z (polygon-a polygon)))))
+	(vn (list (- (vertex-x (polygon-c polygon)) (vertex-x (polygon-a polygon)))
+		  (- (vertex-y (polygon-c polygon)) (vertex-y (polygon-a polygon)))
+		  (- (vertex-z (polygon-c polygon)) (vertex-z (polygon-a polygon))))))
+    (setf (aref normal-vector 0) (- (* (nth 1 un) (nth 2 vn)) (* (nth 2 un) (nth 1 vn)))
+	  (aref normal-vector 1) (- (* (nth 2 un) (nth 0 vn)) (* (nth 0 un) (nth 2 vn)))
+	  (aref normal-vector 2) (- (* (nth 0 un) (nth 1 vn)) (* (nth 1 un) (nth 0 vn))))
+    normal-vector))
+
+;;;;Test
+
+;;(defmacro make-model (model-name (&rest vertices) (&rest polygons))
+;;`(make-object :vertices ,vertices :polygons ,polygons))
+;;
+
+
+#|
+
+
+(defvar plane (let* ((vertices (list (make-vertex :x 30 :y 0 :z -30)
+				     (make-vertex :x -30 :y 0 :z -30)
+				     (make-vertex :x 30 :y 0 :z 30)
+				     (make-vertex :x -30 :y 0 :z 30)))
+		     (polygons (list (make-polygon :a (nth 0 vertices) :b (nth 2 vertices) :c (nth 3 vertices))
+				     (make-polygon :a (nth 0 vertices) :b (nth 1 vertices) :c (nth 3 vertices)))))
+		(make-object :vertices vertices :polygons polygons :color (make-array '(3) :initial-contents '(0.5 0.5 0.5)))))
+(setf (object-y plane) -30)
+
+(defvar triangle (let* ((vertices (list (make-vertex :x 0 :y 0 :z 10)
+					(make-vertex :x -10 :y 0 :z -10)
+					(make-vertex :x 10 :y 0 :z -10)))
+			(polygons (list (make-polygon :a (nth 0 vertices) :b (nth 1 vertices) :c (nth 2 vertices)))))
+		   (make-object :vertices vertices :polygons polygons)))
+
+
+(defvar pyramid (let* ((vertices (list (make-vertex :x 0 :y -10 :z 10)
+				       (make-vertex :x -10 :y -10 :z -10)
+				       (make-vertex :x 10 :y -10 :z -10) ;;;;bottom points
+				       (make-vertex :x 0 :y 10 :z 0))) ;;;;top point
+		       (polygons (list (make-polygon :a (nth 0 vertices) :b (nth 1 vertices) :c (nth 2 vertices))
+				       (make-polygon :a (nth 0 vertices) :b (nth 1 vertices) :c (nth 3 vertices))
+				       (make-polygon :a (nth 0 vertices) :b (nth 2 vertices) :c (nth 3 vertices))
+				       (make-polygon :a (nth 1 vertices) :b (nth 2 vertices) :c (nth 3 vertices)))))
+		  (make-object :vertices vertices :polygons polygons)))
+#|
+(defvar light-cube (let* ((vertices (list (make-vertex :x -1 :y 1 :z -1)
+				    (make-vertex :x 1 :y 1 :z -1)
+				    (make-vertex :x 1 :y -1 :z -1)
+				    (make-vertex :x -1 :y -1 :z -1)
+				    (make-vertex :x -1 :y 1 :z 1)
+				    (make-vertex :x 1 :y 1 :z 1)
+				    (make-vertex :x 1 :y -1 :z 1)
+				    (make-vertex :x -1 :y -1 :z 1)))
+		    (polygons (list (make-polygon :a (nth 0 vertices) :b (nth 1 vertices) :c (nth 4 vertices))
+				    (make-polygon :a (nth 1 vertices) :b (nth 5 vertices) :c (nth 4 vertices))
+				    (make-polygon :a (nth 1 vertices) :b (nth 2 vertices) :c (nth 5 vertices))
+				    (make-polygon :a (nth 2 vertices) :b (nth 6 vertices) :c (nth 5 vertices))
+				    (make-polygon :a (nth 2 vertices) :b (nth 3 vertices) :c (nth 6 vertices))
+				    (make-polygon :a (nth 3 vertices) :b (nth 7 vertices) :c (nth 6 vertices))
+				    (make-polygon :a (nth 3 vertices) :b (nth 0 vertices) :c (nth 7 vertices))
+				    (make-polygon :a (nth 0 vertices) :b (nth 4 vertices) :c (nth 7 vertices))
+				    (make-polygon :a (nth 4 vertices) :b (nth 5 vertices) :c (nth 7 vertices))
+				    (make-polygon :a (nth 5 vertices) :b (nth 6 vertices) :c (nth 7 vertices))
+				    (make-polygon :a (nth 3 vertices) :b (nth 2 vertices) :c (nth 0 vertices))
+				    (make-polygon :a (nth 2 vertices) :b (nth 1 vertices) :c (nth 0 vertices)))))
+	       (make-object :vertices vertices :polygons polygons)))
+(setf (object-x light-cube) 0.0
+      (object-y light-cube) 20.0
+      (object-z light-cube) 0.0)
+
+(setf (object-r light-cube) 1.0
+      (object-g light-cube) 1.0
+      (object-b light-cube) 1.0)
+|#
+
+(defvar cube (let* ((vertices (list (make-vertex :x -10 :y 10 :z -10)
+				    (make-vertex :x 10 :y 10 :z -10)
+				    (make-vertex :x 10 :y -10 :z -10)
+				    (make-vertex :x -10 :y -10 :z -10)
+				    (make-vertex :x -10 :y 10 :z 10)
+				    (make-vertex :x 10 :y 10 :z 10)
+				    (make-vertex :x 10 :y -10 :z 10)
+				    (make-vertex :x -10 :y -10 :z 10)))
+		    (polygons (list (make-polygon :a (nth 0 vertices) :b (nth 1 vertices) :c (nth 4 vertices))
+				    (make-polygon :a (nth 1 vertices) :b (nth 5 vertices) :c (nth 4 vertices))
+				    (make-polygon :a (nth 1 vertices) :b (nth 2 vertices) :c (nth 5 vertices))
+				    (make-polygon :a (nth 2 vertices) :b (nth 6 vertices) :c (nth 5 vertices))
+				    (make-polygon :a (nth 2 vertices) :b (nth 3 vertices) :c (nth 6 vertices))
+				    (make-polygon :a (nth 3 vertices) :b (nth 7 vertices) :c (nth 6 vertices))
+				    (make-polygon :a (nth 3 vertices) :b (nth 0 vertices) :c (nth 7 vertices))
+				    (make-polygon :a (nth 0 vertices) :b (nth 4 vertices) :c (nth 7 vertices))
+				    (make-polygon :a (nth 4 vertices) :b (nth 5 vertices) :c (nth 7 vertices))
+				    (make-polygon :a (nth 5 vertices) :b (nth 6 vertices) :c (nth 7 vertices))
+				    (make-polygon :a (nth 3 vertices) :b (nth 2 vertices) :c (nth 0 vertices))
+				    (make-polygon :a (nth 2 vertices) :b (nth 1 vertices) :c (nth 0 vertices)))))
+	       (make-object :vertices vertices :polygons polygons)))
+(setf (object-x cube) 20.0
+      (object-y cube) -19.5
+      (object-z cube) 20.0)
+(setf (object-r cube) 0.0
+      (object-g cube) 0.98
+      (object-b cube) 0.59)
+
+(defvar diamond (let* ((vertices (list (make-vertex :x 10 :y -10 :z 10)
+				       (make-vertex :x -10 :y -10 :z -10)
+				       (make-vertex :x 10 :y -10 :z -10)
+				       (make-vertex :x -10 :y -10 :z 10) ;;;;middle points
+				       (make-vertex :x 0 :y 10 :z 0) ;;;top point
+				       (make-vertex :x 0 :y -30 :z 0))) ;;;;bottom point
+		       (polygons (list (make-polygon :a (nth 0 vertices) :b (nth 3 vertices) :c (nth 4 vertices))
+				       (make-polygon :a (nth 0 vertices) :b (nth 2 vertices) :c (nth 4 vertices))
+				       (make-polygon :a (nth 1 vertices) :b (nth 3 vertices) :c (nth 4 vertices))
+				       (make-polygon :a (nth 1 vertices) :b (nth 2 vertices) :c (nth 4 vertices))
+				       (make-polygon :a (nth 0 vertices) :b (nth 3 vertices) :c (nth 5 vertices))
+				       (make-polygon :a (nth 0 vertices) :b (nth 2 vertices) :c (nth 5 vertices))
+				       (make-polygon :a (nth 1 vertices) :b (nth 2 vertices) :c (nth 5 vertices))
+				       (make-polygon :a (nth 1 vertices) :b (nth 3 vertices) :c (nth 5 vertices))
+				       )))
+		  (make-object :vertices vertices :polygons polygons)))
+(setf (object-r diamond) 0.0
+      (object-g diamond) 0.5
+      (object-b diamond) 0.5)
+
+;;basic spheric triangle
+;;radius/sine A * sine B = length of one side of a triangle that makes up a sphere
+;;So, for the starting sphere
+;;radius / sine 65 * sine 70 = length of the extended edge
+;;radius - length of the extended edge, then vx + diff and vz + diff = vx and vz of a curved
+;;
+;;nevermind, just use 2/7 to figure out the position of vx and vz
+
+(defvar sphere (let* ((vertices (list ;;top
+				 (make-vertex :x 0 :y 10 :z 0)
+				 ;;1/4
+				 (make-vertex :x 5 :y 7.5 :z 0);;rad
+				 (make-vertex :x (- 5.0 (* 5.0 (/ 2 7))) :y 7.5 :z (- 5.0 (* 5.0 (/ 2 7))))
+				 (make-vertex :x 0 :y 7.5 :z 5);;rad
+				 (make-vertex :x (- -5.0 (* -5.0 (/ 2 7))) :y 7.5 :z (- 5.0 (* 5.0 (/ 2 7))))
+				 (make-vertex :x -5 :y 7.5 :z 0);;rad
+				 (make-vertex :x (- -5.0 (* -5.0 (/ 2 7))) :y 7.5 :z (- -5.0 (* -5.0 (/ 2 7))))
+				 (make-vertex :x 0 :y 7.5 :z -5)
+				 (make-vertex :x (- 5.0 (* 5.0 (/ 2 7))) :y 7.5 :z (- -5.0 (* -5.0 (/ 2 7))))
+				 ;;middle
+				 (make-vertex :x 10 :y 0 :z 0)
+				 (make-vertex :x (- 10 (* 10.0 (/ 2 7))) :y 0 :z (- 10 (* 10.0 (/ 2 7))))
+				 (make-vertex :x 0 :y 0 :z 10)
+				 (make-vertex :x (- -10 (* -10.0 (/ 2 7))) :y 0 :z (- 10 (* 10.0 (/ 2 7))))
+				 (make-vertex :x -10 :y 0 :z 0)
+				 (make-vertex :x (- -10 (* -10.0 (/ 2 7))) :y 0 :z (- -10 (* -10.0 (/ 2 7))))
+				 (make-vertex :x 0 :y 0 :z -10)
+				 (make-vertex :x (- 10 (* 10.0 (/ 2 7))) :y 0 :z (- -10 (* -10.0 (/ 2 7))))
+				 ;;3/4
+				 (make-vertex :x 5 :y -7.5 :z 0);;rad
+				 (make-vertex :x (- 5.0 (* 5.0 (/ 2 7))) :y -7.5 :z (- 5.0 (* 5.0 (/ 2 7))))
+				 (make-vertex :x 0 :y -7.5 :z 5);;rad
+				 (make-vertex :x (- -5.0 (* -5.0 (/ 2 7))) :y -7.5 :z (- 5.0 (* 5.0 (/ 2 7))))
+				 (make-vertex :x -5 :y -7.5 :z 0);;rad
+				 (make-vertex :x (- -5.0 (* -5.0 (/ 2 7))) :y -7.5 :z (- -5.0 (* -5.0 (/ 2 7))))
+				 (make-vertex :x 0 :y -7.5 :z -5)
+				 (make-vertex :x (- 5.0 (* 5.0 (/ 2 7))) :y -7.5 :z (- -5.0 (* -5.0 (/ 2 7))))
+				 ;;bottom
+				 (make-vertex :x 0 :y -10 :z 0)))
+		      (polygons (list (make-polygon :a (nth 0 vertices) :b (nth 1 vertices) :c (nth 2 vertices))
+				      (make-polygon :a (nth 0 vertices) :b (nth 2 vertices) :c (nth 3 vertices))
+				      (make-polygon :a (nth 0 vertices) :b (nth 3 vertices) :c (nth 4 vertices))
+				      (make-polygon :a (nth 0 vertices) :b (nth 4 vertices) :c (nth 5 vertices))
+				      (make-polygon :a (nth 0 vertices) :b (nth 5 vertices) :c (nth 6 vertices))
+				      (make-polygon :a (nth 0 vertices) :b (nth 6 vertices) :c (nth 7 vertices))
+				      (make-polygon :a (nth 0 vertices) :b (nth 7 vertices) :c (nth 8 vertices))
+				      (make-polygon :a (nth 0 vertices) :b (nth 8 vertices) :c (nth 1 vertices))
+				      
+				      (make-polygon :a (nth 1 vertices) :b (nth 9 vertices) :c (nth 10 vertices))
+				      (make-polygon :a (nth 1 vertices) :b (nth 2 vertices) :c (nth 10 vertices))
+				      (make-polygon :a (nth 2 vertices) :b (nth 10 vertices) :c (nth 11 vertices))
+				      (make-polygon :a (nth 2 vertices) :b (nth 3 vertices) :c (nth 11 vertices))
+				      (make-polygon :a (nth 3 vertices) :b (nth 11 vertices) :c (nth 12 vertices))
+				      (make-polygon :a (nth 3 vertices) :b (nth 4 vertices) :c (nth 12 vertices))
+				      (make-polygon :a (nth 4 vertices) :b (nth 12 vertices) :c (nth 13 vertices))
+				      (make-polygon :a (nth 4 vertices) :b (nth 5 vertices) :c (nth 13 vertices))
+				      (make-polygon :a (nth 5 vertices) :b (nth 13 vertices) :c (nth 14 vertices))
+				      (make-polygon :a (nth 5 vertices) :b (nth 6 vertices) :c (nth 14 vertices))
+				      (make-polygon :a (nth 6 vertices) :b (nth 14 vertices) :c (nth 15 vertices))
+				      (make-polygon :a (nth 6 vertices) :b (nth 7 vertices) :c (nth 15 vertices))
+				      (make-polygon :a (nth 7 vertices) :b (nth 15 vertices) :c (nth 16 vertices))
+				      (make-polygon :a (nth 7 vertices) :b (nth 8 vertices) :c (nth 16 vertices))
+				      (make-polygon :a (nth 8 vertices) :b (nth 16 vertices) :c (nth 9 vertices))
+				      (make-polygon :a (nth 8 vertices) :b (nth 9 vertices) :c (nth 1 vertices))
+				      
+				      (make-polygon :a (nth 9 vertices) :b (nth 17 vertices) :c (nth 18 vertices))
+				      (make-polygon :a (nth 9 vertices) :b (nth 10 vertices) :c (nth 18 vertices))
+				      (make-polygon :a (nth 10 vertices) :b (nth 18 vertices) :c (nth 19 vertices))
+				      (make-polygon :a (nth 10 vertices) :b (nth 11 vertices) :c (nth 19 vertices))
+				      (make-polygon :a (nth 11 vertices) :b (nth 19 vertices) :c (nth 20 vertices))
+				      (make-polygon :a (nth 11 vertices) :b (nth 12 vertices) :c (nth 20 vertices))
+				      (make-polygon :a (nth 12 vertices) :b (nth 20 vertices) :c (nth 21 vertices))
+				      (make-polygon :a (nth 12 vertices) :b (nth 13 vertices) :c (nth 21 vertices))
+				      (make-polygon :a (nth 13 vertices) :b (nth 21 vertices) :c (nth 22 vertices))
+				      (make-polygon :a (nth 13 vertices) :b (nth 14 vertices) :c (nth 22 vertices))
+				      (make-polygon :a (nth 14 vertices) :b (nth 22 vertices) :c (nth 23 vertices))
+				      (make-polygon :a (nth 14 vertices) :b (nth 15 vertices) :c (nth 23 vertices))
+				      (make-polygon :a (nth 15 vertices) :b (nth 23 vertices) :c (nth 24 vertices))
+				      (make-polygon :a (nth 15 vertices) :b (nth 16 vertices) :c (nth 24 vertices))
+				      (make-polygon :a (nth 16 vertices) :b (nth 24 vertices) :c (nth 17 vertices))
+				      (make-polygon :a (nth 16 vertices) :b (nth 9 vertices) :c (nth 17 vertices))
+				      
+				      (make-polygon :a (nth 25 vertices) :b (nth 17 vertices) :c (nth 18 vertices))
+				      (make-polygon :a (nth 25 vertices) :b (nth 18 vertices) :c (nth 19 vertices))
+				      (make-polygon :a (nth 25 vertices) :b (nth 19 vertices) :c (nth 20 vertices))
+				      (make-polygon :a (nth 25 vertices) :b (nth 20 vertices) :c (nth 21 vertices))
+				      (make-polygon :a (nth 25 vertices) :b (nth 21 vertices) :c (nth 22 vertices))
+				      (make-polygon :a (nth 25 vertices) :b (nth 22 vertices) :c (nth 23 vertices))
+				      (make-polygon :a (nth 25 vertices) :b (nth 23 vertices) :c (nth 24 vertices))
+				      (make-polygon :a (nth 25 vertices) :b (nth 24 vertices) :c (nth 17 vertices))
+				      )))
+		 (make-object :vertices vertices :polygons polygons)))
+(setf (object-x sphere) -20.0)
+(setf (object-y sphere) -19.5)
+(setf (object-z sphere) -20.0)
+#|
+(defvar sphere (let* ((vertices (list ;;top
+				 (make-vertex :x 0 :y 10 :z 0)
+				 ;;1/4
+				 (make-vertex :x 5 :y 5 :z 0);;rad
+				 (make-vertex :x 4.375 :y 5 :z .625)
+				 (make-vertex :x 2.5 :y 5 :z 2.5)
+				 (make-vertex :x .625 :y 5 :z 4.375)
+
+				 (make-vertex :x 0 :y 5 :z 5);;rad
+				 (make-vertex :x -.625 :y 5 :z 4.375)
+				 (make-vertex :x -2.5 :y 5 :z 2.5)
+				 (make-vertex :x -4.375 :y 5 :z .625)
+				 
+				 (make-vertex :x -5 :y 5 :z 0);;rad
+				 (make-vertex :x -4.375 :y 5 :z -.625)
+				 (make-vertex :x -2.5 :y 5 :z -2.5)
+				 (make-vertex :x -.625 :y 5 :z -4.375)
+				 
+				 (make-vertex :x 0 :y 5 :z -5)
+				 (make-vertex :x .625 :y 5 :z -4.375)
+				 (make-vertex :x 2.5 :y 5 :z -2.5)
+				 (make-vertex :x 4.375 :y 5 :z -.625)
+				 ;;middle
+				 (make-vertex :x 10 :y 0 :z 0)
+				 (make-vertex :x 7.5 :y 0 :z 2.5)
+				 (make-vertex :x 5 :y 0 :z 5)
+				 (make-vertex :x 2.5 :y 0 :z 7.5)
+
+				 (make-vertex :x 0 :y 0 :z 10)
+				 (make-vertex :x -2.5 :y 0 :z 7.5)
+				 (make-vertex :x -5 :y 0 :z 5)
+				 (make-vertex :x -7.5 :y 0 :z 2.5)
+				 
+				 (make-vertex :x -10 :y 0 :z 0)
+				 (make-vertex :x -7.5 :y 0 :z -2.5)
+				 (make-vertex :x -5 :y 0 :z -5)
+				 (make-vertex :x -2.5 :y 0 :z -7.5)
+
+				 (make-vertex :x 0 :y 0 :z -10)
+				 (make-vertex :x 2.5 :y 0 :z -7.5)
+				 (make-vertex :x 5 :y 0 :z -5)
+				 (make-vertex :x 7.5 :y 0 :z -2.5)				      
+				 ;;3/4
+				 (make-vertex :x 5 :y -5 :z 0);;rad
+				 (make-vertex :x 4.375 :y -5 :z .625)
+				 (make-vertex :x 2.5 :y -5 :z 2.5)
+				 (make-vertex :x .625 :y -5 :z 4.375)
+				 
+				 (make-vertex :x 0 :y -5 :z 5);;rad
+				 (make-vertex :x -.625 :y -5 :z 4.375)
+				 (make-vertex :x -2.5 :y -5 :z 2.5)
+				 (make-vertex :x -4.375 :y -5 :z .625)
+				 
+				 (make-vertex :x -5 :y -5 :z 0)
+				 (make-vertex :x -4.375 :y -5 :z -.625)
+				 (make-vertex :x -2.5 :y -5 :z -2.5)
+				 (make-vertex :x -.625 :y -5 :z -4.375)
+
+				 (make-vertex :x 0 :y -5 :z -5);;rad
+				 (make-vertex :x .625 :y -5 :z -4.375)
+				 (make-vertex :x 2.5 :y -5 :z -2.5)
+				 (make-vertex :x 4.375 :y -5 :z -.625)
+				 
+				 
+				 ;;bottom
+				 (make-vertex :x 0 :y -10 :z 0)))
+		      (polygons (list (make-polygon :a (nth 0 vertices) :b (nth 1 vertices) :c (nth 2 vertices))
+				      (make-polygon :a (nth 0 vertices) :b (nth 2 vertices) :c (nth 3 vertices))
+				      (make-polygon :a (nth 0 vertices) :b (nth 3 vertices) :c (nth 4 vertices))
+				      (make-polygon :a (nth 0 vertices) :b (nth 4 vertices) :c (nth 5 vertices))
+				      (make-polygon :a (nth 0 vertices) :b (nth 5 vertices) :c (nth 6 vertices))
+				      (make-polygon :a (nth 0 vertices) :b (nth 6 vertices) :c (nth 7 vertices))
+				      (make-polygon :a (nth 0 vertices) :b (nth 7 vertices) :c (nth 8 vertices))
+				      (make-polygon :a (nth 0 vertices) :b (nth 8 vertices) :c (nth 9 vertices))
+				      (make-polygon :a (nth 0 vertices) :b (nth 9 vertices) :c (nth 10 vertices))
+				      (make-polygon :a (nth 0 vertices) :b (nth 10 vertices) :c (nth 11 vertices))
+				      (make-polygon :a (nth 0 vertices) :b (nth 11 vertices) :c (nth 12 vertices))
+				      (make-polygon :a (nth 0 vertices) :b (nth 12 vertices) :c (nth 13 vertices))
+				      (make-polygon :a (nth 0 vertices) :b (nth 13 vertices) :c (nth 14 vertices))
+				      (make-polygon :a (nth 0 vertices) :b (nth 14 vertices) :c (nth 15 vertices))
+				      (make-polygon :a (nth 0 vertices) :b (nth 15 vertices) :c (nth 16 vertices))
+				      (make-polygon :a (nth 0 vertices) :b (nth 16 vertices) :c (nth 1 vertices))
+				      (make-polygon :a (nth 1 vertices) :b (nth 17 vertices) :c (nth 18 vertices))
+				      (make-polygon :a (nth 1 vertices) :b (nth 2 vertices) :c (nth 18 vertices))
+				      (make-polygon :a (nth 2 vertices) :b (nth 18 vertices) :c (nth 19 vertices))
+				      (make-polygon :a (nth 2 vertices) :b (nth 3 vertices) :c (nth 19 vertices))
+				      (make-polygon :a (nth 3 vertices) :b (nth 19 vertices) :c (nth 20 vertices))
+				      (make-polygon :a (nth 3 vertices) :b (nth 4 vertices) :c (nth 20 vertices))
+				      (make-polygon :a (nth 4 vertices) :b (nth 20 vertices) :c (nth 21 vertices))
+				      (make-polygon :a (nth 4 vertices) :b (nth 5 vertices) :c (nth 21 vertices))
+				      (make-polygon :a (nth 5 vertices) :b (nth 21 vertices) :c (nth 22 vertices))
+				      (make-polygon :a (nth 5 vertices) :b (nth 6 vertices) :c (nth 22 vertices))
+				      (make-polygon :a (nth 6 vertices) :b (nth 22 vertices) :c (nth 23 vertices))
+				      (make-polygon :a (nth 6 vertices) :b (nth 7 vertices) :c (nth 23 vertices))
+				      (make-polygon :a (nth 7 vertices) :b (nth 23 vertices) :c (nth 24 vertices))
+				      (make-polygon :a (nth 7 vertices) :b (nth 8 vertices) :c (nth 24 vertices))
+				      (make-polygon :a (nth 8 vertices) :b (nth 24 vertices) :c (nth 25 vertices))
+				      (make-polygon :a (nth 8 vertices) :b (nth 9 vertices) :c (nth 25 vertices))
+				      (make-polygon :a (nth 9 vertices) :b (nth 25 vertices) :c (nth 26 vertices))
+				      (make-polygon :a (nth 9 vertices) :b (nth 10 vertices) :c (nth 26 vertices))
+				      (make-polygon :a (nth 10 vertices) :b (nth 26 vertices) :c (nth 27 vertices))
+				      (make-polygon :a (nth 10 vertices) :b (nth 11 vertices) :c (nth 27 vertices))
+				      (make-polygon :a (nth 11 vertices) :b (nth 27 vertices) :c (nth 28 vertices))
+				      (make-polygon :a (nth 11 vertices) :b (nth 12 vertices) :c (nth 28 vertices))
+				      (make-polygon :a (nth 12 vertices) :b (nth 28 vertices) :c (nth 29 vertices))
+				      (make-polygon :a (nth 12 vertices) :b (nth 13 vertices) :c (nth 29 vertices))
+				      (make-polygon :a (nth 13 vertices) :b (nth 29 vertices) :c (nth 30 vertices))
+				      (make-polygon :a (nth 13 vertices) :b (nth 14 vertices) :c (nth 30 vertices))
+				      (make-polygon :a (nth 14 vertices) :b (nth 30 vertices) :c (nth 31 vertices))
+				      (make-polygon :a (nth 14 vertices) :b (nth 15 vertices) :c (nth 31 vertices))
+				      (make-polygon :a (nth 15 vertices) :b (nth 31 vertices) :c (nth 32 vertices))
+				      (make-polygon :a (nth 15 vertices) :b (nth 16 vertices) :c (nth 32 vertices))
+				      (make-polygon :a (nth 16 vertices) :b (nth 17 vertices) :c (nth 32 vertices))
+				      (make-polygon :a (nth 16 vertices) :b (nth 17 vertices) :c (nth 1 vertices)))))
+		 (make-object :vertices vertices :polygons polygons)))
+(setf (object-x sphere) -20.0)
+(setf (object-y sphere) -19.0)
+(setf (object-z sphere) -20.0)
+|#
+
+
+|#
+#|
+(defun load-texture (file-name)
+  (let* ((image (sdl2-image:load-image file-name))
+	 (w (sdl2:surface-width image))
+	 (h (sdl2:surface-height image))
+	 (gl-surface nil)
+	 (mode? :rgba)
+	 (texture-id 0))
+    (setf texture-id (gl:gen-textures 1))
+    (setf gl-surface (sdl2:create-rgb-surface w h 32))
+    (sdl2:blit-surface image nil gl-surface nil)
+    (gl:bind-texture :texture-2d texture-id)
+    (gl:tex-parameter :texture-2d :texture-min-filter :linear)
+    (gl:tex-parameter :texture-2d :texture-mag-filter :linear)
+    (gl:tex-image-1d :texture-2d 0 mode? (* (sdl2:surface-width gl-surface) (sdl2:surface-height gl-surface)) 0 mode? :unsigned-byte (sdl2:surface-pixels gl-surface))
+    texture-id))
+#|  (let* ((image (pngload:load-file file-name :flatten t))
+	 (mode? :rgba)
+	 (byte-reader nil)
+	 (data nil)
+	 (w (pngload:width image))
+	 (h (pngload:height image))
+	 (texture-id 0))
+    (setf data (make-array (list (* w h 4))
+			   :element-type (array-element-type (pngload:data image))
+			   :displaced-to (pngload:data image)))
+    (case (pngload:bit-depth image)
+      (8 (setf byte-reader :unsigned-byte))
+      (16 (setf byte-reader :unsigned-short)))
+    (setf texture-id (gl:gen-textures 1))
+    (gl:bind-texture :texture-2d texture-id)
+    (gl:tex-image-2d :texture-2d 0 :rgba8 w h 0 :rgba mode? data)
+    (gl:tex-parameter :texture-2d :texture-min-filter :linear)
+    (gl:tex-parameter :texture-2d :texture-mag-filter :linear)))|#
+  
+;;(setf (object-texture-id (cadr (model-objects nika))) (load-texture "/home/neon-frost/Work Files/3D/Nika Dress Tex - Dress Patterns.png"))
+|#

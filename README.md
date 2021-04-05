@@ -1,5 +1,6 @@
 # Tamias
 A game engine implemented in Common LISP, focusing currently on 2D support, but 3D is planned down the Road
+As of right now, there is only support for the ogg music format. Use of mp3, wav or mod for _music_ is untested.
 
 # Building
 Install an implementation of common lisp, SBCL is the only one I can guarantee Tamias will work on. Install quicklisp.

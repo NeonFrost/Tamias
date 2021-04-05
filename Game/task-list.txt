@@ -1,0 +1,40 @@
+Rendering:
+	Generalized ui-element -
+	frame
+	button
+	window
+	text
+	entry
+	spin-box
+	menu-bar
+	menu
+	menu-item
+	node
+
+
+Actions:
+	Generalized ui-element -
+	frame
+	button
+	window
+	text
+	entry
+	spin-box
+	menu-bar
+	menu
+	menu-item
+	node
+
+Hover:
+	Generalized ui-element -
+	frame
+	button
+	window
+	text
+	entry
+	spin-box
+	menu-bar
+	menu
+	menu-item
+	node
+	

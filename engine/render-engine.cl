@@ -1,6 +1,14 @@
 (defun render-state ()
-  (loop for render-function in (state-render-list (eval tamias:state))
-     do (funcall render-function)))
+#|  (loop for render-function in (state-render-list (eval tamias:state))
+  do (funcall render-function))|#
+  (tamias-render (state-symbol tamias:state) (state-sub-state tamias:state))
+  (if tamias:messages
+      (progn (loop for n below (length tamias:messages)
+		do (render:render-string (nth n tamias:messages) 0 (* n 16) :color tamias:messages-color))
+	     (incf tamias:messages-counter 1)
+	     (if (> tamias:messages-counter 3000)
+		 (setf tamias:messages nil
+		       tamias:messages-counter 0)))))
 
 (defvar +transition-box-alpha+ 0)
 (defvar +transition-state+ 'to)
@@ -8,7 +16,7 @@
   (if tamias:changing-state
       (if (and (state-transition (eval tamias:state))
 	       (state-transition (eval tamias:changing-state)))
-	  (progn (render-box 0
+	  (progn (render:box 0
 			     0
 			     tamias:screen-width
 			     tamias:screen-height

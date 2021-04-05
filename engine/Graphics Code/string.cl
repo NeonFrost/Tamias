@@ -1,6 +1,14 @@
 #|
 On rendering strings, either use a ttf file and use a 'buffer' with the strings (rendering a string through sdl-ttf requires many calculations and procedures to take place, resulting in /massive/ slowdown if done every frame update) or use a tile sheet with 256 characters on it, take the ascii character code of each character of the string (i.e. a = 58), divide by 16, with the quotient being used for the row and the remainder being used for the column (60/16 = 3 12/16 = R:3 C:12) cell and then render it to either a buffer (recommended) or to the renderer
 |#
+(defpackage tamias.string
+  (:use :cl)
+  (:export character-size
+	   create-text-buffer
+	   ascii-to-string
+	   parse-hex-color
+	   combine-strings))
+(in-package :tamias.string)
 (defvar character-size '(16 16))
 
 (defun ascii-to-string (code)
@@ -19,6 +27,7 @@ On rendering strings, either use a ttf file and use a 'buffer' with the strings 
        (setf str (concatenate 'string str s)))
   str)
 
+#|
 (defun start-string (str &rest strs)
   (loop for s in strs
        do (setf str (with-output-to-string (stream)
@@ -27,7 +36,7 @@ On rendering strings, either use a ttf file and use a 'buffer' with the strings 
 		      ))
        (setf str (concatenate 'string str s)))
   str)
-
+|#
 (defun render-character-to-buffer (cell x y buffer &key (color (list 255 255 255)))
   (let ((src-rect (sdl2:make-rect (* (cadr cell) (car character-size))
 				  (* (car cell) (cadr character-size))
@@ -47,6 +56,8 @@ On rendering strings, either use a ttf file and use a 'buffer' with the strings 
     (sdl2:free-rect dest-rect)
     (sdl2:free-rect tmp-rect)
     ))
+
+
 
 (defun create-text-buffer (string &key (width 256) (height 256) to-surface);;yeah, this needs to be changed significantly
   ;;some of the code below, that will be gone by the time somebody else reads this, was being used for a rogue-like I was developing

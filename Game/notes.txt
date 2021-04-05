@@ -1,0 +1,106 @@
+
+Very very basic GUI test
+
+Have 3 buttons, on click, they each emit a different signal.
+
+One text entry field
+
+One spinbox 
+
+
+
+Flow:
+
+Tamias start
+|
+V
+GUI lib INIT
+|
+V
+GUI states INIT
+
+In app:
+
+Click -> (test-click) -> get *mouse-x* *mouse-y*, check collision against each element --V
+      	 	      	     	       		  		  	       	    ,----'
+								--------------------'
+				    Test Menu-bar  <------------|
+								V
+								UI-frames -> check against
+									     each element
+								|
+								V
+								
+per-element key-down-check
+
+rendering:
+(I still prefer my own non-OOP subsystem, but it's too complicated to interface nicely
+   i.e., using hash-tables instead of methods)
+
+(gui.render-elements tamias:state) automatically gets the current sub-state.
+		     If something is to be rendered regardless of state, set sub-state to t
+		     for each rendering method needed (render-menu-bar tamias:state t)
+		     
+The next major step in the GUI subsystem after it's up and running correctly is to implement a context sub-system or a more advanced sub-state system
+Currently, I feel that the sub-state system is lacking, but I'm not sure how to expand on it. May need to read shit
+
+Basically, Application = Blender, State = Modeling/Sculpting/Texture-paint, sub-state = object-mode/edit-mode/texture-paint-mode/pose-mode
+Maybe I should implement a state-mode? Change the sub-state system to a mode system? That would be such a major overhaul...good god. Or implement a mode-system on top of sub-states? Well...ah shit
+You literally can't implement blender in the current tamias codebase...fuuuuuck
+
+...You need to setup sub-windows...for each state...the menu-bar...hrmmmmmmm
+
+Alright...so...I will need to write in a way to create and delete sub-windows on the fly
+Each sub-window would have it's own state...oooh now *THAT* would be interesting
+in fact, that's actually what I need to do for S'daia.
+
+So, to finalize for the time being
+Application -> App Frame -> Frame windows -> each window has it's own state/sub-state system? And the application itself has it's own state/sub-state system? So that, for example, Morrowind would be state: Main-game, sub-state: speech-text, and then the window for dialogue would have it's own state/sub-state, i.e. Dialogue-window state: __Default__ sub-state: __Response__
+or State: Main-game sub-state: inventory , sub-windows: inventory, map, stats mini-map
+Inventory sub-window: State: All sub-state: move
+
+Architecture:
+
+tamias:state -> :default-tamias-state
+	     	 sub-state: 'top
+		 "sub-windows": default-window : (input state sub-state)
+						 Button 1
+		 			       	 Button 2
+		 		win-2 : label 1 (input state sub-state) Button 1 (input state sub-state)
+				        label 2 Button 2
+				win-3 : Button 1 Label 1
+				      	
+
+
+So, each window has a state, iirc
+Each State/sub-state has their own gui, keybindings, etc.
+
+To finalize:
+figure out how to insert input into each game object (so that we're checking...what exactly?)
+       Okay...so basically, if we want to create an interactive "world" then there needs to be some sort of box used to test for interaction.
+       This is the same idea I have with regards to how Morrowind works, but just in 2d. Could be a box, could be quadroid
+
+Add a generalized function to branch input, i guess? Generalized functions, like gui-check, is necessary for this. May need to extend core architecture to handle GUI, like branching the keyboard input function in engine/input/keyboard.cl
+
+So, yeah, a passthrough of sorts is needed. But I don't know how to do this 'pass through'
+
+Methods can be created like usual.
+However (tamias-key ...) needs to be passed through to a sub-system function which is modified by the programmer.
+
+the idea is that ui-entry can just insert the Character that is not ctrl/shift/alt/etc.
+
+So:
+
+>Input
+-->Tamias input sub-system (is-mouse? is-kboard?)
+---->Does input need to be rerouted?
+----->No
+------->Validate input
+----->Yes
+------->Check collision of interaction-box (2d in this case)
+--------->Collision true?
+----------->Yes
+------------->Validate input if object in interaction-box (if no valid input is found, continue checking objects)
+		       	     	Note: will need to have some implementation of Quad-trees
+----------->No
+------------->Validate input (ex: if z is for attack, then attack

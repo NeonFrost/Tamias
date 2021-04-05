@@ -6,7 +6,7 @@
 (defvar text-test "This is a sample of \"slowly\" revealing text.")
 (defun reveal-text-fun ()
   (let ((text-to-draw (subseq text-test 0 current-length)))
-    (render-text text-to-draw 128 128 :width (* current-length 16) :height 16 :color +white+))
+    (render:render-text text-to-draw 128 128 :width (* current-length 16) :height 16 :color +white+))
   (incf timer-10)
   (if (>= timer-10 2)
       (progn (incf current-length)

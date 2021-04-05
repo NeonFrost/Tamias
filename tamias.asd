@@ -2,20 +2,25 @@
   :author "Brandon Blundell | Neon Frost"
   :maintainer "Brandon Blundell | Neon Frost"
   :license "MIT"
-  :version "0.4"
+  :version "0.7"
   :description "A game engine built and designed in Common LISP."
   :build-operation program-op
   :build-pathname "VIDYA"
   :entry-point "cl-user::main"
   :depends-on (:sdl2
 	       :sdl2-image
-	       :sdl2-mixer)
-  :components ((:file "values" :type "cl")
-	       (:file "states" :type "cl")
-	       (:module "engine"
+	       :sdl2-mixer
+	       :sdl2-ttf)
+  :components ((:module "engine"
 			:serial t
 			:components
-			((:module "Graphics Code"
+			((:module "core"
+				  :serial t
+				  :components
+				  ((:file "tamias" :type "cl")
+				   (:file "states" :type "cl")))
+			 (:file "macros" :type "cl")
+			 (:module "Graphics Code"
 				  :serial t
 				  :components
 				  ((:file "string" :type "cl")
@@ -28,7 +33,6 @@
 				  ((:file "entities" :type "cl")
 				   (:file "vectors")
 				   (:file "math" :type "cl")
-				   ;;(:file "move-platformer" :type "cl") ;;I uh, I don't know. 
 				   (:file "2D-particles")
 				   #|(:modlue "Physics"
 				   :serial t
@@ -44,6 +48,6 @@
 				  ((:file "mouse" :type "cl")
 				   (:file "keyboard" :type "cl")))
 			 (:file "loops" :type "cl")
-			 (:file "render-engine" :type "cl")))
-	       (:file "init-assets" :type "cl")
-	       (:file "Main")))
+			 (:file "render-engine" :type "cl")
+			 (:file "init-assets" :type "cl")
+			 (:file "init-main" :type "cl")))))

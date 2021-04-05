@@ -1,0 +1,2 @@
+
+This is a placeholder for what will be a guide on using the Tamias GUI subsystem

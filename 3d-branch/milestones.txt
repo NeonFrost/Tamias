@@ -1,0 +1,8 @@
+Milestone 1:
+
+  A: Nika travels along a plane with geometry (no collision, no up/down movement)
+  B: Nika can move and attack, able to move between 2 rooms
+    a: Small fishing game with some amount of flavor text
+  C: Ming is created and finished within the 3D environment
+  D: Vector fighter is done
+

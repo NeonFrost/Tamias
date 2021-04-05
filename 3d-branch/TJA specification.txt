@@ -1,0 +1,55 @@
+used in conjunction with an obj file
+
+So some notes on other stuff: in a t3da file, the formating will be different. Since a t3da file is specifically for use with "Tamias 3d", interoperability between other engines isn't a priority. So, therefore, the first section of a t3da file will be similar to a obj file, but will, instead, be focused on having indexing supported
+Further t3da specification will come in the future, when I've got things figured out and the engine is fully up and running, then I'll create teh official t3da file specification (and a py file for blender 2.8)
+^
+|
+|
+Hehehe, yeah no. If I want to do animation without using collada, etc. then I'll have to make the t3da file format, because the obj exporter for blender is not compatible with tja.
+The obj exporter in blender does not export the objects (or meshes, models, whatever you want to call them) in the same order that my tja exporter does
+Basically, obj 0 = tja [last object], so Vert 0 of an obj file is vert [length - 1] of the tja weights, causing the bones to be misapplied to vertices.
+No ifs ands or butts about it. Either use collada, etc. or make the t3da
+So, t3da it is.
+
+
+The idea is that the first object in an obj file corresponds to the first skin of a tja file
+so
+Char_dress -> Char_dress_skin
+char_scarf -> char_scarf_skin
+
+likewise, each vertex corresponds with a vertex index, bone index and weight index
+obj	       	      tja
+v 0.0 0.1 0.0    ->   0 2 0
+
+(note on extended obj: indices will be zero-bound, rather than 1-bound
+      obj: f 1// 2// 3//
+      extended: f 0// 1// 2//)
+
+conventions: [] corresponds to using brackets in the file. so [values] would be [0 0 1...]
+	     
+
+similar to the .dae file extension we begin with defining the skins
+
+VersionNumber "V:1.0"
+ARMATURES
+Armature_id name
+bone_num
+bone-name head tail loc rot scale bind-matrix
+
+Parent: Child-1 child-2 ... child-n . Parent-2: child-1 child-2 ... child-n . Parent-n ...
+
+SKINS :: model_name
+number_of_skins:number_of_weights
+skin_name
+texture_file ;; if none, then NIL
+skin_weights ;;the weights, assumes obj like vertices
+[v_index bone_index weights_index] ;;index array ... this is not an "index" array. This is a Vert-ind bond-ind and WEIGHT vector array.
+
+ANIMATIONS
+Animation_id name ;;Animation_id includes Animation name, the joint and stuff
+time_array [frame : time, ...]
+bone_name bone_num
+[head] [tail] [location] [rotation] [scale] [frame 0]
+[head] [tail] [location] [rotation] [scale] [frame n]
+bone_name bone_num
+...

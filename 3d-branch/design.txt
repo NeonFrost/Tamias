@@ -1,0 +1,16 @@
+Scene Hierarchy
+
+Model
+  |
+  -->object
+       |
+       -->Polygon
+	     |
+  	     -->Vertices: |Spatial coordinates
+	     	       	  |texture Coordinates
+			  |Normal coordinates
+
+Rendering:
+First setup VBOs and VAOs
+Check which shader is required
+      At this point, I'm unsure of whether or not I'm going to have it be model wide or object wide (i.e. (model-shader-id model) or (object-shader-id object))

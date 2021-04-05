@@ -1,0 +1,54 @@
+The big thing to note is that I'm going to get a physical riichi mahjongg set before I actually make this. I want to know all the rules before making a sub-par implemenetation of it
+Also: It's going to be one of those projects I use to further the 3d engine
+
+4 players
+
+4 suits
+Characters
+Bamboo
+Target
+Honors (ESWN winds, RGW dragons)
+
+closed/open hand:
+a closed hand is when you have not declared rin/pon/kan (i think) or otherwise 
+
+
+
+yaku:
+Winning player must have at least 1 yaku, otherwise they lose points (distributed to other players)
+
+
+
+
+winning hand:
+
+4 sequences/matches and one pair
+
+bamboo/1-2-3, targets/1-2-3, characters/8-8-8, 3 norths and 2 red dragons is a winning hand.
+If you had no directions and dragons, instead opting for a pon of bamboo/5, and a pair of character/2, then it would be a chambo hand, because there is no yaku (meaning you lose points)
+
+4 sets of 1-2-3 bamboo and a pair of 8 bamboo is a winning hand
+
+
+declarations:
+-Pon
+  -Is a set of 3 of a piece (3 bamboo/8)
+-Kan
+  -Declared when you have a pon of something and the 4th piece of it is either drawn by holding player or discarded by another player
+  -I believe you can call kan if you already have declared pon, but only if the piece is in your hand
+  -Example: I have a closed pon of bamboo/3 and player N discards a bamboo/3. I declare "Kan".
+  -Calling Kan when you have self-drawn the last piece (where you have, say, 4 bamboo/8)
+-Tsumo:
+  -Self-draw winning tile (be it for a pair or meld), does not need to be closed.
+	  A closed Tsumo results in a yaku (menzen tsumo)
+
+-Ron
+  -Win by using somebody elses discarded piece
+
+-riichi
+  -closed hand (no Pon or Chii)
+
+
+Han & Fu:
+Han and Fu exist for scoring purposes.
+While they increase your score, you still need at least 1 yaku to declare a winning hand

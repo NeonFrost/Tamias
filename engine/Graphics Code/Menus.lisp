@@ -43,6 +43,7 @@
   (setf tamias:screen-width (car (nth tamias:resolution tamias:resolution-list))
 	tamias:screen-height (cadr (nth tamias:resolution tamias:resolution-list)))
   (sdl2:set-window-size tamias:default-window tamias:screen-width tamias:screen-height)
+;;  (gl:viewport 0 0 tamias:screen-width tamias:screen-height)
   (loop for menu in **tamias-menus**
      do (setf (menu-x menu) (+ (eval (menu-x-equation menu)) 6)
 	      (menu-y menu) (+ (eval (menu-y-equation menu)) 6)

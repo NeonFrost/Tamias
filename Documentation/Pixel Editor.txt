@@ -1,0 +1,40 @@
+This is a guide about how to make a (basic) pixel editor in Tamias
+
+ 1. Setup
+
+Design a basic Interface.
+
++-------------------+
+|File_Edit_View_Help|
+|-------------------|
+|To| Canvas     |Pal|
+|ol| 		|ett|
+|bo|		|e  |
+|x |		|   |
+|-------------------|
+|Tool_Mode_saved?   |
++-------------------+
+
+ 2. Setting up GUI code
+
+ (automatic resizing will be done internally, API user does not need to set up resizing)
+
+ 3. Setting up a Canvas
+
+ Fuck if I know.
+ In this portion I'll cover how to make a new UI-element
+
+ There are two main parts to a UI-element: Rendering and Input
+
+ 3a. Setting up rendering for our canvas
+ 3b. Setting up input for our canvas
+ 3c. Implemeneting a basic zoom function
+
+ 4. Setting up Tool code
+
+ Displaying where the tool is, using our own custom images for cursors
+
+ 5. Saving/Loading a canvas
+
+ 6. Exporting to PNG
+

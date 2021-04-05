@@ -1,0 +1,325 @@
+(defun parse-float (float-str)
+  (if (find #\e float-str)
+      (with-input-from-string (str float-str)
+	(read str))
+      (let ((whole 0)
+	    (rem 0)
+	    (upper "");;xx.
+	    (lower "");;.xx
+	    (parsed-float 0.0))
+	(setf upper (subseq float-str 0 (position #\. float-str))
+	      lower (subseq float-str (1+ (position #\. float-str))))
+	(setf whole (parse-integer upper)
+	      rem (parse-integer lower))
+	(if (>= rem 1)
+	    (setf rem (/ rem (expt 10.0 (length lower)))))
+	(if (< whole 0)
+	    (setf parsed-float (- whole rem))
+	    (setf parsed-float (+ whole rem)))
+	(if (eq whole 0)
+	    (if (char= (aref float-str 0) #\-)
+		(setf parsed-float (* parsed-float -1.0))))
+	(* parsed-float 1.0))))
+
+#|
+(defun parse-float (float-str)
+  (with-input-from-string (str float-str)
+    (read str)))
+
+So, uh...
+This is a little...frustrating
+So, the parse-float above (with-input-...) produces a correct result
+however, it takes longer
+How much longer?
+
+try this with both:
+(time (parse-float "1.2e-1"))
+(time (parse-float "1.34341234e-5"))
+(time (parse-float "1.2"))
+(time (parse-float "1.34341234"))
+
+
+V1: (with-input...)
+0.000270 seconds of total run time (0.000248 user, 0.000022 system)
+0.000027 seconds of total run time (0.000027 user, 0.000000 system)
+
+V2: (let ((whole ...)))
+0.000060 seconds of total run time (0.000060 user, 0.000000 system)
+0.000041 seconds of total run time (0.000041 user, 0.000000 system)
+
+Basically, V2 is faster, but less accurate
+           V1 is slower, but more accurate
+I'll eventually research it, but for now I'm worried about accuracy. If I can figure out how to make "V2" more accurate without that much of
+a hit on speed, then I'll use it. Otherwise, V1 will be used
+
+Actually, what if...I combine them?
+At least, for the time being.
+If it gets to the point that processing e notation gets to be a major slowdown, I'll modify the function, some more, and optimize from there
+Speed and Accuracy are my prime worries.
+
+test string: "1.2e-1"
+(defun parse-float (float-str)
+  (let ((whole 0)
+	(rem 0)
+	(upper "");;xx.
+	(lower "");;.xx
+	(multiplier 1.0)
+	(parsed-float 0.0))
+    (setf upper (subseq float-str 0 (position #\. float-str))
+	  lower (subseq float-str (1+ (position #\. float-str))))
+    (if (find #\e lower)
+	(setf multiplier (expt 10.0 (parse-integer (subseq lower (1+ (position #\e lower)))))
+	      lower (subseq lower 0 (position #\e lower))))
+    (setf whole (* (parse-integer upper) 1.0)
+	  rem (parse-integer (subseq lower 0 (position #\e lower))))
+    (if (>= rem 1)
+	(setf rem (/ rem (expt 10.0 (length lower)))))
+    (if (< whole 0)
+	(setf parsed-float (- whole rem))
+	(setf parsed-float (+ whole rem)))
+    (if (eq whole 0)
+	(if (char= (aref float-str 0) #\-)
+	    (setf parsed-float (* parsed-float -1))))
+    (* parsed-float multiplier)))
+|#
+
+(defstruct keyframed-models
+  models)
+
+(defstruct model
+  (position (make-array '(3) :initial-contents '(0.0 0.0 0.0)))
+  (rotation (make-array '(3) :initial-contents '(0.0 0.0 0.0)))
+  (scale (make-array '(4) :initial-contents '(1.0 1.0 1.0 1.0)))
+  vertices
+  normal-vertices
+  texture-vertices
+  objects
+  shaders ;;initial version will be a list. Final version will have it be an array...well, for the pure game engine. If it's in, like, an editor, then it's a list...unless...
+  animation ;;intial use is of tja
+  weights ;; THIS IS TEMPORARY. All this is just to make it easier to do CPU calc shit
+  (frame 1.0)
+  (key 0)
+  name)
+
+(defmacro model-width (model)
+  `(aref (model-scale ,model) 0))
+(defmacro model-height (model)
+  `(aref (model-scale ,model) 1))
+(defmacro model-depth (model)
+  `(aref (model-scale ,model) 2))
+(defmacro model-scale-scalar (model)
+  `(aref (model-scale ,model) 3))
+
+(defmacro model-rotation-x (model)
+  `(aref (model-rotation ,model) 0))
+(defmacro model-rotation-y (model)
+  `(aref (model-rotation ,model) 1))
+(defmacro model-rotation-z (model)
+  `(aref (model-rotation ,model) 2))
+(defmacro model-x (model)
+  `(aref (model-position ,model) 0))
+(defmacro model-y (model)
+  `(aref (model-position ,model) 1))
+(defmacro model-z (model)
+  `(aref (model-position ,model) 2))
+
+(defstruct model-group
+  (models nil))
+
+"Note on vertex-bones: Since we'll be loading from a file, it will be an array. Same with weights. Bones will be an array of indices...or not.
+I may have to move vertex-bones to bone-vertices. i.e. the bone has the ''list'' of vertices it affects rather than the vertex has the bones it's affected by
+Space wise, bone-vertices makes sense, along with the weights of said vertice, i.e. [165 .8, 230 .7, 245 .6]"
+
+(defstruct vertex
+  (values (make-array '(3) :initial-contents '(0.0 0.0 0.0))))
+#|
+  (position (make-array '(3) :initial-contents '(0.0 0.0 0.0)))
+  (normal (make-array '(3) :initial-contents '(0.0 0.0 0.0)))
+  (uv (make-array '(2) :initial-contents '(0.0 0.0))))
+|#
+
+(defmacro vertex-x (vertice)
+  `(aref (vertex-values ,vertice) 0))
+(defmacro vertex-y (vertice)
+  `(aref (vertex-values ,vertice) 1))
+(defmacro vertex-z (vertice)
+  `(aref (vertex-values ,vertice) 2))
+
+(defmacro normal-x (vertice)
+  `(aref (vertex-values ,vertice) 0))
+(defmacro normal-y (vertice)
+  `(aref (vertex-values ,vertice) 1))
+(defmacro normal-z (vertice)
+  `(aref (vertex-values ,vertice) 2))
+
+(defmacro vertex-u (vertice)
+  `(aref (vertex-values ,vertice) 0))
+(defmacro vertex-v (vertice)
+  `(aref (vertex-values ,vertice) 1))
+
+(defstruct point
+  (position-index 0)
+  normal-index
+  texture-index)
+
+(defstruct polygon
+  (points (make-array '(3) :initial-contents (list (make-point) (make-point) (make-point))))
+  )
+(defmacro polygon-a (polygon)
+  `(aref (polygon-points ,polygon) 0))
+(defmacro polygon-b (polygon)
+  `(aref (polygon-points ,polygon) 1))
+(defmacro polygon-c (polygon)
+  `(aref (polygon-points ,polygon) 2))
+
+(defmacro position-a (polygon)
+  `(point-position-index (polygon-a ,polygon)))
+(defmacro position-b (polygon)
+  `(point-position-index (polygon-b ,polygon)))
+(defmacro position-c (polygon)
+  `(point-position-index (polygon-c ,polygon)))
+
+(defmacro normal-a (polygon)
+  `(point-normal-index (polygon-a ,polygon)))
+(defmacro normal-b (polygon)
+  `(point-normal-index (polygon-b ,polygon)))
+(defmacro normal-c (polygon)
+  `(point-normal-index (polygon-c ,polygon)))
+
+(defmacro texture-a (polygon)
+  `(point-texture-index (polygon-a ,polygon)))
+(defmacro texture-b (polygon)
+  `(point-texture-index (polygon-b ,polygon)))
+(defmacro texture-c (polygon)
+  `(point-texture-index (polygon-c ,polygon)))
+
+(defmacro polygon-vertex-a (model polygon)
+  `(aref (model-vertices ,model) (point-position-index (polygon-a ,polygon))))
+(defmacro polygon-vertex-b (model polygon)
+  `(aref (model-vertices ,model) (point-position-index (polygon-b ,polygon))))
+(defmacro polygon-vertex-c (model polygon)
+  `(aref (model-vertices ,model) (point-position-index (polygon-c ,polygon))))
+
+(defmacro polygon-normal-a (model polygon)
+  `(aref (model-normal-vertices ,model) (point-normal-index (polygon-a ,polygon))))
+(defmacro polygon-normal-b (model polygon)
+  `(aref (model-normal-vertices ,model) (point-normal-index (polygon-b ,polygon))))
+(defmacro polygon-normal-c (model polygon)
+  `(aref (model-normal-vertices ,model) (point-normal-index (polygon-c ,polygon))))
+
+(defmacro polygon-texture-a (model polygon)
+  `(aref (model-texture-vertices ,model) (point-texture-index (polygon-a ,polygon))))
+(defmacro polygon-texture-b (model polygon)
+  `(aref (model-texture-vertices ,model) (point-texture-index (polygon-b ,polygon))))
+(defmacro polygon-texture-c (model polygon)
+  `(aref (model-texture-vertices ,model) (point-texture-index (polygon-c ,polygon))))
+
+#|
+note on particles:
+Leave a trail:
+(particles :velocity-vectors '(0 0 0) :spatial-vectors '(ox oy oz) '(1- ox, 1- oy, 1- oz))
+
+|#
+
+(defstruct object
+  (name "")
+  (position (make-array '(3) :initial-contents '(0.0 0.0 0.0)))
+  (rotation (make-array '(3) :initial-contents '(0.0 0.0 0.0)))
+  (scale (make-array '(4) :initial-contents '(1.0 1.0 1.0 1.0)))
+  (material nil) ;;eventually turn into an index
+  (smoothing t)
+  (color (make-array '(3) :initial-contents (list 0.0 (/ (1+ (random 100)) 100.0) (/ (1+ (random 100)) 100.0))))
+;;  (vertices nil) ;;make it an array, contigent upon the number of vertices in a list. Unfortunately, this may increase load times
+  (polygons nil) ;;make it an array, contigent upon the number of polygons made from the vertices.
+  (info nil)
+  (texture-id nil)) 
+
+(defmacro object-width (object)
+  `(aref (object-scale ,object) 0))
+(defmacro object-height (object)
+  `(aref (object-scale ,object) 1))
+(defmacro object-depth (object)
+  `(aref (object-scale ,object) 2))
+(defmacro object-scale-scalar (object)
+  `(aref (object-scale ,object) 3))
+
+(defmacro object-x (object)
+  `(aref (object-position ,object) 0))
+(defmacro object-y (object)
+  `(aref (object-position ,object) 1))
+(defmacro object-z (object)
+  `(aref (object-position ,object) 2))
+
+(defmacro object-rotation-x (object)
+  `(aref (object-rotation ,object) 0))
+(defmacro object-rotation-y (object)
+  `(aref (object-rotation ,object) 1))
+(defmacro object-rotation-z (object)
+  `(aref (object-rotation ,object) 2))
+
+(defmacro object-r (object)
+  `(aref (object-color ,object) 0))
+(defmacro object-g (object)
+  `(aref (object-color ,object) 1))
+(defmacro object-b (object)
+  `(aref (object-color ,object) 2))
+
+(defun calculate-normal-vecs (va vb vc)
+  (let ((normal-vector (make-array '(3) :initial-contents '(0.0 0.0 0.0)))
+	(un (list (- (vertex-x vb) (vertex-x va))
+		  (- (vertex-y vb) (vertex-y va))
+		  (- (vertex-z vb) (vertex-z va))))
+	(vn (list (- (vertex-x vc) (vertex-x va))
+		  (- (vertex-y vc) (vertex-y va))
+		  (- (vertex-z vc) (vertex-z va)))))
+    (setf (aref normal-vector 0) (- (* (nth 1 un) (nth 2 vn)) (* (nth 2 un) (nth 1 vn)))
+	  (aref normal-vector 1) (- (* (nth 2 un) (nth 0 vn)) (* (nth 0 un) (nth 2 vn)))
+	  (aref normal-vector 2) (- (* (nth 0 un) (nth 1 vn)) (* (nth 1 un) (nth 0 vn))))
+    normal-vector))
+#|
+(defvar plane (let* ((vertices (list (make-vertex :values (make-array '(3) :initial-contents '(30 0 -30)))
+				     (make-vertex :values (make-array '(3) :initial-contents '(-30 0 -30)))
+				     (make-vertex :values (make-array '(3) :initial-contents '(30 0 30)))
+				     (make-vertex :values (make-array '(3) :initial-contents '(-30 0 30)))))
+		     (polygons (list (make-polygon) ;;:a (nth 0 vertices) :b (nth 2 vertices) :c (nth 3 vertices))
+				     (make-polygon))));; :a (nth 0 vertices) :b (nth 1 vertices) :c (nth 3 vertices)))))
+		(setf (point-position-index (polygon-a (nth 0 polygons))) 3
+		      (point-position-index (polygon-b (nth 0 polygons))) 2
+		      (point-position-index (polygon-c (nth 0 polygons))) 1
+		      (point-position-index (polygon-a (nth 1 polygons))) 2
+		      (point-position-index (polygon-b (nth 1 polygons))) 1
+		      (point-position-index (polygon-c (nth 1 polygons))) 0)
+		(make-model :vertices (make-array (list (length vertices)) :initial-contents vertices)
+			    :objects (list (make-object :name "Plane" :polygons (make-array (list (length polygons)) :initial-contents polygons)
+							:color (make-array '(3) :initial-contents '(0.5 0.5 0.5)))))))
+(setf (model-y plane) -60)
+(defvar dress-plane (let* ((vertices (list (make-vertex :values (make-array '(3) :initial-contents '(-30 -30 0)))
+					 (make-vertex :values (make-array '(3) :initial-contents '(-30 30 0)))
+					 (make-vertex :values (make-array '(3) :initial-contents '(30 -30 0)))
+					 (make-vertex :values (make-array '(3) :initial-contents '(30 30 0)))))
+			   (polygons (list (make-polygon) ;;:a (nth 0 vertices) :b (nth 2 vertices) :c (nth 3 vertices))
+					   (make-polygon))));; :a (nth 0 vertices) :b (nth 1 vertices) :c (nth 3 vertices)))))
+		(setf (point-position-index (polygon-a (nth 0 polygons))) 0
+		      (point-position-index (polygon-b (nth 0 polygons))) 1
+		      (point-position-index (polygon-c (nth 0 polygons))) 2
+		      (point-position-index (polygon-a (nth 1 polygons))) 1
+		      (point-position-index (polygon-b (nth 1 polygons))) 3
+		      (point-position-index (polygon-c (nth 1 polygons))) 2)
+		(make-model :vertices (make-array (list (length vertices)) :initial-contents vertices)
+			    :texture-vertices (make-array '(4) :initial-contents (list (make-vertex :values (make-array '(2) :initial-contents (list 0.0 0.0)))
+										       (make-vertex :values (make-array '(2) :initial-contents (list 0.0 1.0)))
+										       (make-vertex :values (make-array '(2) :initial-contents (list 1.0 0.0)))
+										       (make-vertex :values (make-array '(2) :initial-contents (list 1.0 1.0)))))
+			    :objects (list (make-object :name "Plane" :polygons (make-array (list (length polygons)) :initial-contents polygons)
+							:color (make-array '(3) :initial-contents '(0.5 0.5 0.5)))))))
+(setf (model-z dress-plane) 60
+      (model-scale-scalar dress-plane) 2.0)
+
+(setf (point-texture-index (polygon-a (aref (object-polygons (car (model-objects dress-plane))) 0))) 0
+      (point-texture-index (polygon-b (aref (object-polygons (car (model-objects dress-plane))) 0))) 1
+      (point-texture-index (polygon-c (aref (object-polygons (car (model-objects dress-plane))) 0))) 2
+      (point-texture-index (polygon-a (aref (object-polygons (car (model-objects dress-plane))) 1))) 1
+      (point-texture-index (polygon-b (aref (object-polygons (car (model-objects dress-plane))) 1))) 3
+      (point-texture-index (polygon-c (aref (object-polygons (car (model-objects dress-plane))) 1))) 2)
+|#
+(load "vao.cl")

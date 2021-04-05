@@ -1,0 +1,33 @@
+5/20/2020 (2 a.m.)
+	  Demos need to be updated. I'm not even joking, I need to write 2 very small songs at less than 1 mb each for the audio demo (playing and switching audio)
+	  Lots of stuff has been changed so far
+	  For one, I realized that the methodology that I was originally going about with regards to the handling of 'logic' (non-rendered functions) and stuff was basically
+	      	   reimplementing the CLOS. I'm not joking. Look through the old code and ask yourself "How similar is this, from a design perspective, to the CL Object System?"
+ 	  So, the backend has changed and I have done quite a bit of refactoring.
+
+	  Keys have been updated to be more simple to interact with (you don't need to branch for ctrl or shift in the body, it's in a list for the method (... :ctrl t))
+	  Logic has been shifted to be more easy to interact with, same with rendering.
+	  The state subsystem has been shifted and changed as a result of these changes, get-state will get the current state structure, while get-state-symbol will get the current state symbol
+	  
+
+5/15/2020 Started work on fully implementing UI into tamias
+
+5/12/2020 Changed how input is handeled. Much more simplified and easier to read (though may be more resource intensive, will need to figure out how to test between the two versions...How about re-using Kitchen Craze's code?)
+
+5/10/2020 Work resumed
+
+4/9/2020 Introduced idea of tamias-types, specifically for use with UI elements.
+4/8/2020 Changed render-text's dest-width/dest-height to width/height to better facilitate accurate representation of ideas
+
+Getting the animation system up and running (albeit rigidly) killed my willingness to code until the end of January, where I tried to make a Timeline (authoring program for timelines in stories, ala LOTR) program in Python. After much headaches of trying to get that to work, I gave up on it.
+
+10/29/2019 Skeletal animation phase 1 complete (primitive, needs lots of work), Work halted on 3d engine
+10/8/2019 Work started on Skeletal animation
+9/23/2019 Work started on 3d engine segment
+~7/25/2019 Introduced idea of palettes
+
+5/?/2018 Completed and released Kitchen Craze
+
+8/?/2017 Work started on MING - Acronym for MING Is Not Galaga
+
+9/?/2016 Started work on RPG

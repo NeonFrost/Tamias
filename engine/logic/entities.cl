@@ -75,8 +75,8 @@
   weapon
   armor
   (symbol "E")
-  (bg-color +black+)
-  (symbol-color +white+)
+  (bg-color tamias.colors:+black+)
+  (symbol-color tamias.colors:+white+)
   (score 0))
 
 (loop for stat in '(attack

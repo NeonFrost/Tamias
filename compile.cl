@@ -3,6 +3,8 @@
 
 (defun load-project (project)
   (asdf:load-system project))
+(defun load-game (game)
+  (asdf:load-system game))
 
 (defun load-demos ()
   (load-project :demos))

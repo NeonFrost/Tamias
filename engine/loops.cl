@@ -1,6 +1,8 @@
 (defun process-loop ()
-  (loop for func in (gethash tamias:sub-state (state-loops (eval tamias:state)))
+  (tamias-logic (state-symbol tamias:state) (state-sub-state tamias:state))
+#|  (loop for func in (gethash tamias:sub-state (state-loops (eval tamias:state)))
      do (funcall func))
+|#
   )
 
 (defun pause-game ()

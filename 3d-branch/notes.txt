@@ -1,0 +1,39 @@
+Engine is geared towards only 256 Megabytes of video memory being available
+
+Various things need to be kept track of, such as number of vertices, number of bones, number of textures, number of shaders, etc.
+Due to this, there will need to be limiters on everything
+
+Weights: Only 2 per vertex. On import, check how many weights are used. Normalize to 2: Get all weights used, Figure out which ones have the least amount attached to them, get the total, div by 2 and add it to the 2 biggest weights
+
+Things to implement:
+
+Navigation Mesh (NavMesh)
+
+
+Sub-systems:
+  -Modifiers:
+    -Duplicator - Duplicates an object at (x, y, z), is a list. "Compiles" it to an array.
+    -"Array" - Just like blender's. It is specifically to help cut down on Gfx mem usage.
+    	       So, the general idea is that this would be used within an editor.
+	       The model (a single mesh or a collection of meshes) is loaded first. Next, the modifier activates, rerendering the model with a modified location. Given the locs of [(0, 0, 0) {0, 10, 0) (5, 16, 10)] the model's vertices are rendered at (vertex-x/y/z + 0/0/0) (vertex-x/y/z + 0/10/0) (vertex-x/y/z + 5/16/10)
+		   There will also be a rotational aspect to this.
+
+
+
+Notes on landscaping:
+   -In blender, create the landscape (how the land is supposed to look)
+   -Next, set up tiling for each 'type' of tile (i.e. tiling for snow, dirt, grass, paths, etc.)
+   -A possible couple ways to do it would be:
+     -A: Having a mask per tile type (great for a few types and blending, but bad for memory usage)
+     -B: Having a single mask layer that uses specific colors for specific tiles (great for many types and memory usage, but bad for blending)
+     -So, we need to have a C, one that works great for many types, memory usage and blending
+      	  -So, we need to clamp the values. Using 8 tile types (from bottom up: dirt, gravel, rocky dirt, marsh, thatch, grass, snowy grass, snow):
+	       	       	  	    	    	  -0-255: [0,31] dirt, [32, 63]...
+						  -So, we want to have the middle be 100% opacity with no blending going on.
+						       0-? is 0% to 100% opacity and (31 - offset) to 31 is 100 to 0
+						       So, we get the range of 0 - ? and do 100/? to get the 'blending factor'
+						   The general rule is
+						       V > [8] and V < [24] then O = 100
+						       V > [24] then O = (- 100 (- Max V))
+						       V < [8] then O = (- 100 (- V min))
+						       

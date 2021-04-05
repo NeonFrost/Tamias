@@ -15,37 +15,50 @@
 
 (defun modify-text ()
   (case (nth current-color-state (color-text-state color-text))
+
     (r (if (< (car (color-text-color color-text)) 230)
 	   (incf (nth 0 (color-text-color color-text)) 30))
+
        (if (>= (caddr (color-text-color color-text)) 30)
 	   (decf (nth 2 (color-text-color color-text)) 30))
+
        (if (and (>= (car (color-text-color color-text)) 230)
 		(<= (cadr (color-text-color color-text)) 30))
 	   (incf current-color-state)))
+    
     (rg (incf (nth 1 (color-text-color color-text)) 30)
 	(if (>= (cadr (color-text-color color-text)) 230)
 	    (incf current-color-state)))
+
     (g (decf (nth 0 (color-text-color color-text)) 30)
        (if (<= (car (color-text-color color-text)) 30)
 	   (incf current-color-state)))
+
     (gb (incf (nth 2 (color-text-color color-text)) 30)
 	(if (>= (caddr (color-text-color color-text)) 230)
 	   (incf current-color-state)))
+
     (b (decf (nth 1 (color-text-color color-text)) 30)
        (if (<= (cadr (color-text-color color-text)) 30)
 	   (incf current-color-state)))
+
     (rb (incf (nth 0 (color-text-color color-text)) 30)
 	(if (>= (car (color-text-color color-text)) 230)
 	    (setf current-color-state 0))))
+  
   (if (>= (color-text-scale color-text) 3.0)
       (setf (color-text-scale-incrementor color-text) -0.1)
+
       (if (<= (color-text-scale color-text) 1.0)
 	  (setf (color-text-scale-incrementor color-text) 0.1)))
+  
   (incf (color-text-scale color-text) (color-text-scale-incrementor color-text))
+
   (if (>= (color-text-rotate color-text) 45)
       (setf (color-text-rotate-inc color-text) -3)
       (if (<= (color-text-rotate color-text) -45)
 	  (setf (color-text-rotate-inc color-text) 3)))
+
   (incf (color-text-rotate color-text) (color-text-rotate-inc color-text))
   )
 

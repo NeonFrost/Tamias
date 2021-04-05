@@ -1,0 +1,46 @@
+Required implementations:
+Input	 -	Mostly Done     - refactored 
+Graphics -	Mostly Done     - 
+Audio	 -	Mostly Done     - 
+OS interaction (files mainly)	- Mostly Done
+Demos - Rendering
+      	States
+	Input
+	Audio
+	Physics
+	animation
+
+Input:
+Keyboard focus until 0.9, where rudimentary controller support will be added
+better mouse support - Done?
+DONE: Move from :scancode-KEY to :KEY
+FIXED: check with os to see if mod keys are being used rather than left/right modkeys (I have the caps lock key acting as a control key and it doesn't register as control.)
+
+Gfx:
+Implement cirles and arcs - Check if SDL2 gfx has been ported
+DONE, NEEDS TESTING: refactor spritesheet stuff
+      	    	     ensure all gfx functions work - IN PROGRESS
+		     Cull as necessary - IN PROGRESS
+
+Fix image fonts, implement ttf support - IN PROGRESS
+
+Audio:
+Refactor and fix music subsystem (currently not broken, but feels like it needs work.)
+make it easier to do stuff with music files
+
+Ensure sfx are easy to use
+
+DONE..Sort Of: implement ability to use multiple extensions (mp3 et al)
+	       		 in "Main.lisp" the line (sdl2-mixer:init :ogg), add in either :wave or :mod after :ogg if you need them. 
+
+OS:
+Unsure, probably make save files easy to implement (i.e. (save-game "name.EXT" things to save) (load-save-game "file.ext")
+
+Demos:
+Self explanatory
+One that uses the particle system
+Audio: Change tracks, play-sound on key press
+Mahjongg (tile matching, not Riichi, but do want to implement it)
+
+
+change sub-state references to (state-sub-state tamias:state)

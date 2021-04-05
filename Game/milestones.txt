@@ -1,0 +1,35 @@
+So first off:
+
+Buttons - Very basic UI element, will allow test of: rendering, hover, action
+
+COMPLETED MILESTONE 1 11/22/2020
+
+Labels - Ensures that render:string works correctly and as expected (width & height imply how big you want the text to be, not how big the text is)
+
+
+Side note: Should the text function use x y as absolute coordinates, or use them as the center?
+
+Entry - Ensure that keyboard input is working correctly
+
+
+Once the above is done, work on a stock simulator that can:
+     -Sort By:
+     	   -Name
+	   -Price
+	   -Change
+	   -Dividends
+     
+
+
+Eventually I want to make a gui editor, the gui editor will make it infinitely easier to create guis and edit them
+
+Big thing will be creating a node editor
+
+GUI projects:
+
+-Stock Simulator
+
+-Basic node editor (like cards with text)
+
+-GUI maker/editor (make the GUI side of programs in this)
+
