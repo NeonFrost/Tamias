@@ -33,7 +33,7 @@ Notes on landscaping:
 						       0-? is 0% to 100% opacity and (31 - offset) to 31 is 100 to 0
 						       So, we get the range of 0 - ? and do 100/? to get the 'blending factor'
 						   The general rule is
-						       V > [8] and V < [24] then O = 100
-						       V > [24] then O = (- 100 (- Max V))
-						       V < [8] then O = (- 100 (- V min))
+						       V > [8] and V < [24] then Op = 100
+						       V > [24] then Op = (- 100 (- Max V))
+						       V < [8] then Op = (- 100 (- V min))
 						       

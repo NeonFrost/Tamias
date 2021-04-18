@@ -31,6 +31,7 @@ Enable sharpness, hue and saturation (i.e. TV settings in the game)
 (defvar tamias-3d-messages nil)
 (load "math-lib.cl")
 (load "lib.cl")
+(load "assets/plane.cl")
 (load "drawing-lib.cl")
 
 (defvar camera-x 0)
@@ -328,7 +329,7 @@ From Blender, I need: Bones: Head, Tail, rotation, location, scale, and everythi
     return-vec
     ))
 
-(setf (model-key nika) 0)
+;;(setf (model-key nika) 0)
 
 (defvar nika-timer 0)
 
@@ -546,20 +547,20 @@ From Blender, I need: Bones: Head, Tail, rotation, location, scale, and everythi
 	     (setf nika-timer 0)))
   (if (> (model-key nika) 5)
   (setf (model-key nika) 0))|#
-  (if anim-running?
+#|  (if anim-running?
       (progn (incf (model-frame nika-bent-jump) .5)
 	     (incf (model-frame robert) .5)
 	     (incf (model-frame nika-roller) .5)))
-  (alt-draw plane;; socra test-tower dress-plane
+  |#(alt-draw plane;; socra test-tower dress-plane
 ;;	    nika
 	    ;;	    alt-nika
-	    robert
-	    nika-bent-jump
-	    nika-roller
+;;	    robert
+;;	    nika-bent-jump
+;;	    nika-roller
 	    ))
 
 (defvar model-key 0)
-
+#|
 (defun set-nika-values ()
   (setf (model-scale-scalar alt-nika) 10.0)
   (setf model-key 0
@@ -576,7 +577,7 @@ From Blender, I need: Bones: Head, Tail, rotation, location, scale, and everythi
   (setf (model-rotation-x test-tower) 0.0)
   (setf (model-x socra) 60)
   (setf (model-key nika) 0))
-
+|#
 ;;(set-nika-values)
 
 (defun set-key-frames (models)
@@ -720,9 +721,10 @@ From Blender, I need: Bones: Head, Tail, rotation, location, scale, and everythi
 	  (gl:use-program shader-prog)|#
 	  ;;	  (sdl2:hide-cursor)
 	  ;;	  (setf (object-texture-id (cadr (model-objects nika))) (load-png #P"/home/neon-frost/Work Files/3D/Nika Dress Tex - Dress Patterns.png")
-	  (setf (object-texture-id (cadr (model-objects nika))) (load-texture #P"/home/neon-frost/Work Files/3D/Nika Dress Tex - Dress Patterns.png")
+#|	  (setf (object-texture-id (cadr (model-objects nika))) (load-texture #P"/home/neon-frost/Work Files/3D/Nika Dress Tex - Dress Patterns.png")
 		(object-texture-id (car (model-objects dress-plane))) (object-texture-id (cadr (model-objects nika)))
-		(object-texture-id (car (model-objects test-tower))) (load-texture "/home/neon-frost/Work Files/3D/Cavern Floor - Cartoon.png"))
+	  (object-texture-id (car (model-objects test-tower))) (load-texture "/home/neon-frost/Work Files/3D/Cavern Floor - Cartoon.png"))|#
+	  #|
 	  (if (not (model-animation nika))
 	      (progn (setf (model-animation nika) (tja-importer "Nika.tja")
 			   (model-weights nika) (make-array (list (car (array-dimensions (model-vertices nika))))))
@@ -779,6 +781,7 @@ From Blender, I need: Bones: Head, Tail, rotation, location, scale, and everythi
 		(model-x nika-roller) -20.0
 		(model-z robert) -100
 		(model-x nika) -20.0)
+	  |#
 ;;	  (setf nika-dress-id (load-png #P"/home/neon-frost/Work Files/3D/Nika Dress Tex - Dress Patterns.png"))
           (sdl2:with-event-loop (:method :poll)
             (:keydown (:keysym keysym)

@@ -11,7 +11,7 @@
   (render.menu-bar 'gui-tester 'top))
 
 (add-state-ui-element 'gui-tester 'top (make-ui-button :x 200 :x-equation 200 :y 200 :y-equation 200 :action `(setf rend-text (not rend-text))))
-(add-state-ui-element 'gui-tester 'top (make-ui-label :x 300 :x-equation 300 :y 300 :y-equation 300 :width 272 :width-equation 272 :height 16 :height-equation 16 :label "Hey Dad, it Works" :hidden `,'`,rend-text))
+(add-state-ui-element 'gui-tester 'top (make-ui-label :x 300 :x-equation 300 :y 300 :y-equation 300 :width 272 :width-equation 272 :height 16 :height-equation 16 :label "It Works" :hidden `,'`,rend-text))
 
 (add-mouse :button-left ('gui-tester 'top :down nil)
   (tamias.gui.click))

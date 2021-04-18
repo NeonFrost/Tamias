@@ -240,7 +240,7 @@ object name
 	      (object-g obj) 1.0
 	      (object-z obj) -200.0)))
 	
-(load-nika)
+;;(load-nika)
 
 #|
 (defun load-png (filename &optional (texture-id (car (gl:gen-textures 1))
