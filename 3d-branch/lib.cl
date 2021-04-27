@@ -232,7 +232,10 @@ Leave a trail:
 ;;  (vertices nil) ;;make it an array, contigent upon the number of vertices in a list. Unfortunately, this may increase load times
   (polygons nil) ;;make it an array, contigent upon the number of polygons made from the vertices.
   (info nil)
-  (texture-id nil)) 
+  vao
+  ibo
+  vbo-ids
+  (texture-id nil));;note to self, use new objects for the eyes of Moriarty
 
 (defmacro object-width (object)
   `(aref (object-scale ,object) 0))

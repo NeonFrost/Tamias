@@ -34,6 +34,9 @@ I may end up either creating an auxilary table which will have symbols as keys, 
     (:fragment (gethash shader-id tamias-fragment-shaders))
     (:geometry (gethash shader-id tamias-geometry-shaders))))
 
+(defun get-shader-id (shader-symbol shader-type)
+  )
+
 (defun get-shader-string (shader-id shader-type)
   (tamias-shader-string (get-shader shader-id shader-type)))
 
