@@ -1,3 +1,51 @@
+#|
+Model-group needs to be implemented
+Shaders will be bound per model group
+|#
+(defun draw-vao (model)
+#| 
+ (let ((rot-x (+ world-rotation-x world-rotation-inc-x))
+	(rot-y (+ world-rotation-y world-rotation-inc-y))
+	(rot-z (+ world-rotation-z world-rotation-inc-z)))
+|#
+    (loop for object in (model-objects model)
+       do
+	 #|(if (or (< (object-rotation-x object) -360)
+		  (> (object-rotation-x object) 360))
+	      (setf (object-rotation-x object) 0))
+	 (if (or (< (object-rotation-y object) -360)
+		 (> (object-rotation-y object) 360))
+	     (setf (object-rotation-y object) 0))
+	 (if (or (< (object-rotation-z object) -360)
+		 (> (object-rotation-z object) 360))
+	     (setf (object-rotation-z object) 0))
+	 (gl:translate (+ (object-x object) (model-x model)) (+ (model-y model) (object-y object)) (+ (model-z model) (object-z object)))
+	 (gl:rotate (+ (object-rotation-x object) (model-rotation-x model)) 1.0 0.0 0.0)
+	 (gl:rotate (+ (object-rotation-y object) (model-rotation-y model)) 0.0 1.0 0.0)
+	 (gl:rotate (+ (object-rotation-z object) (model-rotation-z model)) 0.0 0.0 1.0)
+	 (gl:scale (* (object-width object) (model-scale-scalar model))
+		   (* (object-height object) (model-scale-scalar model))
+		   (* (object-depth object) (model-scale-scalar model)))
+|#
+;;       (gl:bind-vertex-array (object-vao object))
+	 (gl:bind-buffer :array-buffer (car (object-vbo-ids object)))
+       ;;     (gl:vertex-attrib-pointer 0 3 :float nil 3 (cffi:null-pointer))
+;;         (gl:enable-vertex-attrib-array 0)
+       ;;	 (gl:draw-arrays :triangles 0 4)
+	 (gl:draw-elements :triangles (gl:make-null-gl-array :unsigned-short) :count 3)
+#|	 (gl:translate (- (+ (object-x object) (model-x model))) (- (+ (object-y object)  (model-y model))) (- (+ (object-z object) (model-z model))))
+	 (gl:load-identity)
+	 (gl:translate (+ 0.0 camera-x) (+ -50.0 camera-y) (+ -300 camera-z))
+	 (gl:rotate rot-x 1.0 0.0 0.0)
+	 (gl:rotate rot-y 0.0 1.0 0.0)
+	 (gl:rotate rot-z 0.0 0.0 1.0)
+	 )
+|#))
+
+(defun draw-vaos (&rest models)
+  (loop for model in models
+     do (draw-vao model)))
+
 (defun alt-draw (&rest models)
   (let ((rot-x (+ world-rotation-x world-rotation-inc-x))
 	(rot-y (+ world-rotation-y world-rotation-inc-y))

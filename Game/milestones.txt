@@ -4,12 +4,22 @@ Buttons - Very basic UI element, will allow test of: rendering, hover, action
 
 COMPLETED MILESTONE 1 11/22/2020
 
-Labels - Ensures that render:string works correctly and as expected (width & height imply how big you want the text to be, not how big the text is)
+Labels - Ensures that render:text works correctly and as expected (width & height imply how big you want the text to be, not how big the text is)
+
+Works, but make sure that the label UI is (+ text-height (/ char-height 2))
+       	   	if text-height = char-height * 3, then thats 48. so label should be 56 pixels tall
+
+Side note: Should the text function use x y as absolute coordinates, or use them as the center? - origin-as-center resolves this issue.
+
+Completed: M2 5/1/2021
 
 
-Side note: Should the text function use x y as absolute coordinates, or use them as the center?
+Entry - Ensure that keyboard input is working correctly - done
+      	Activated entry should have a different color to show that it's in edit mode.
+		Branch for whether or not edit mode is on. i.e. keyboard-shortcuts won't work app-wide
+		       	   -??? Does it Require modifiying keyboard input function in engine/input ???
 
-Entry - Ensure that keyboard input is working correctly
+Semi-Completed : Needs branching for entry mode, needs text wrapping
 
 
 Once the above is done, work on a stock simulator that can:
@@ -18,8 +28,16 @@ Once the above is done, work on a stock simulator that can:
 	   -Price
 	   -Change
 	   -Dividends
-     
 
+
+Completed: M3 5/5/2021
+
+
+Get menu-bar up and running and ensure that ui-menu works as expected
+
+
+
+Other UI elements need to be created and tested, such as spin box and combo box with radio buttons
 
 Eventually I want to make a gui editor, the gui editor will make it infinitely easier to create guis and edit them
 
@@ -32,4 +50,6 @@ GUI projects:
 -Basic node editor (like cards with text)
 
 -GUI maker/editor (make the GUI side of programs in this)
+
+-Item creator for S'daia (to be ported to 3d)
 

@@ -4,7 +4,7 @@ Necessities:
 
 Must be able to organize by column
 
-| Name | Ticker | Price | Change |
+| Ticker | Price | Change |
 
 Once one of the columns is clicked, it reorders the stock list to display by whatever category was clicked
 

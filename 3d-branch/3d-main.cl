@@ -29,10 +29,11 @@ Enable sharpness, hue and saturation (i.e. TV settings in the game)
 |#
 
 (defvar tamias-3d-messages nil)
-(load "math-lib.cl")
-(load "lib.cl")
+(load "lib/math-lib.cl")
+(load "lib/lib.cl")
+(load "lib/vao.cl")
 (load "assets/plane.cl")
-(load "drawing-lib.cl")
+(load "lib/drawing-lib.cl")
 
 (defvar camera-x 0)
 (defvar camera-y 0)
@@ -84,15 +85,58 @@ gl_BackSecondaryColor = gl_SecondaryColor;
 }
 
  ")
+
+(setf *vert-shader* "#version 140
+
+// Input vertex data, different for all executions of this shader.
+//layout(location = 0) in vec3 vertexPosition_modelspace;
+in vec3 vertexPosition_modelspace;
+//layout(location = 1) in vec2 vertexUV;
+//in vec3 vertexPosition_modelspace;
+//out vec4 colour;
+
+// Output data ; will be interpolated for each fragment.
+//out vec2 UV;
+//const vec4 white = vec4(vertexPosition_modelspace, 1.0);
+
+// Values that stay constant for the whole mesh.
+//uniform mat4 MVP;
+
+void main(){
+//colour = vec4(1.0);
+    // Output position of the vertex, in clip space : MVP * position
+//    gl_Position =  MVP * vec4(vertexPosition_modelspace,1);
+gl_Position = vec4(vertexPosition_modelspace, 1.0);
+
+    // UV of the vertex. No special space for this one.
+//    UV = vertexUV;
+
+}")
+(setf *vert-shader* "#version 140
+
+// Input vertex data, different for all executions of this shader.
+in vec3 vertexPosition_modelspace;
+
+void main(){
+gl_Position = vec4(vertexPosition_modelspace, 1.0);
+
+}")
+
 (defvar *frag-shader*
   "#version 130
+//precision highp float;
+//in vec4 colour;
+
+out vec4 fragcolor;
+
 void main()
 {
-	gl_FragColor = gl_Color; //vec4(0.4,0.4,0.8,1.0);
-}
-")
+	fragcolor = vec4(0.0,1.0,0.0,1.0);
+}")
 
-(load "importer.cl")
+(defvar shader-prog nil)
+
+(load "importers/importer.cl")
 
 (defvar polygon-count 0)
 
@@ -125,7 +169,7 @@ void main()
       (incf world-rotation-inc-y .6))
   (gl:matrix-mode :projection)
   (gl:load-identity)
-  (let ((asp (/ 900 1200.0))) ;;asp = width/height
+  (let ((asp (/ 300 400.0))) ;;asp = width/height
     (gl:frustum -1.0 1.0 (- asp) asp (+ 1.0 world-scale) 10000.0))
 ;;    (gl:ortho (+ -400 world-scale) (+ 400 world-scale) (+ -400 world-scale) (+ 400 world-scale) (+ -800 world-scale) (+ 800 world-scale)))
   ;;(gl:frustum LEFT RIGHT NEG-ASPect ASPect ZNEAR VIEW-DISTANCE)
@@ -155,13 +199,16 @@ void main()
       (progn (incf (model-frame nika-bent-jump) .5)
 	     (incf (model-frame robert) .5)
 	     (incf (model-frame nika-roller) .5)))
-  |#(alt-draw plane;; socra test-tower dress-plane
+  (alt-draw plane;; socra test-tower dress-plane
 ;;	    nika
 	    ;;	    alt-nika
 ;;	    robert
 ;;	    nika-bent-jump
 ;;	    nika-roller
-	    ))
+     )
+  |#
+  (draw-vaos plane-2)
+  )
 
 (defvar model-key 0)
 #|
@@ -256,13 +303,13 @@ void main()
 	(format t "Setting up window/gl.~%")
 	(finish-output)
 	(sdl2:gl-make-current win gl-context)
-	(sdl2:set-window-size win 1200 900)
-	(gl:viewport 0 0 1200 900)
-	(gl:shade-model :smooth)
+	(sdl2:set-window-size win 1000 700)
+	(gl:viewport 0 0 1000 700)
+;	(gl:shade-model :smooth)
 	(gl:matrix-mode :projection)
 	(gl:load-identity)
 	(gl:ortho -100 100 -100 100 -200 200)
-	(gl:cull-face :back)
+	;;	(gl:cull-face :back)
 	(gl:light :light0 :position '(0.0 0.0 -50.0 1.0))
 	(gl:light :light0 :diffuse (vector light-r light-g light-b 1))
 ;;	(gl:light-model :light-model-ambient '(.5 .5 .5 1.0))
@@ -274,7 +321,7 @@ void main()
 	(gl:polygon-mode :front-and-back :fill)
 	(gl:matrix-mode :modelview)
 	(gl:load-identity)
-	(gl:clear-color 0.3 0.3 0.3 1.0)
+	(gl:clear-color 0.2 0.2 0.2 1.0)
 	(gl:clear :color-buffer :depth-buffer) 
 
 
@@ -315,78 +362,19 @@ void main()
 	  ;; You can attach the same shader to multiple different programs.
 	  (gl:attach-shader shader-prog vs)
 	  (gl:attach-shader shader-prog fs)
+
+	  (gl:bind-attrib-location shader-prog 0 "vertexPosition_modelspace")
+	  
 	  ;; Don't forget to link the program after attaching the
 	  ;; shaders. This step actually puts the attached shader together
 	  ;; to form the program.
-	  #|	    (gl:link-program shader-prog)
+	  (gl:link-program shader-prog)
 	  ;; If we want to render using this program object, or add
 	  ;; uniforms, we need to use the program. This is similar to
 	  ;; binding a buffer.
-	  (gl:use-program shader-prog)|#
-	  ;;	  (sdl2:hide-cursor)
-	  ;;	  (setf (object-texture-id (cadr (model-objects nika))) (load-png #P"/home/neon-frost/Work Files/3D/Nika Dress Tex - Dress Patterns.png")
-#|	  (setf (object-texture-id (cadr (model-objects nika))) (load-texture #P"/home/neon-frost/Work Files/3D/Nika Dress Tex - Dress Patterns.png")
-		(object-texture-id (car (model-objects dress-plane))) (object-texture-id (cadr (model-objects nika)))
-	  (object-texture-id (car (model-objects test-tower))) (load-texture "/home/neon-frost/Work Files/3D/Cavern Floor - Cartoon.png"))|#
-	  #|
-	  (if (not (model-animation nika))
-	      (progn (setf (model-animation nika) (tja-importer "Nika.tja")
-			   (model-weights nika) (make-array (list (car (array-dimensions (model-vertices nika))))))
-		     (loop for n below (car (array-dimensions (tja-data-weights (model-animation nika))))
-			do (let ((weight-arr (aref (tja-data-weights (model-animation nika)) n)))
-			     (if (eq (aref (model-weights nika) (aref weight-arr 0)) 0)
-				 (progn (setf (aref (model-weights nika) (aref weight-arr 0)) nil
-					      (aref (model-weights nika) (aref weight-arr 0)) (remove nil (aref (model-weights nika) (aref weight-arr 0))))
-					(push (list (aref weight-arr 1) (aref weight-arr 2)) (aref (model-weights nika) (aref weight-arr 0))))
-				 (push (list (aref weight-arr 1) (aref weight-arr 2)) (aref (model-weights nika) (aref weight-arr 0))))))))
-	  (if (not alt-nika)
-	      (progn (setf alt-nika (t3da-importer "Nika.t3da")
-			   (model-weights alt-nika) (make-array (list (car (array-dimensions (model-vertices alt-nika))))))
-		     (loop for n below (car (array-dimensions (tja-data-weights (model-animation alt-nika))))
-			do (let ((weight-arr (aref (tja-data-weights (model-animation alt-nika)) n)))
-			     (if (eq (aref (model-weights alt-nika) (aref weight-arr 0)) 0)
-				 (progn (setf (aref (model-weights alt-nika) (aref weight-arr 0)) nil
-					      (aref (model-weights alt-nika) (aref weight-arr 0)) (remove nil (aref (model-weights alt-nika) (aref weight-arr 0))))
-					(push (list (aref weight-arr 1) (aref weight-arr 2)) (aref (model-weights alt-nika) (aref weight-arr 0))))
-				 (push (list (aref weight-arr 1) (aref weight-arr 2)) (aref (model-weights alt-nika) (aref weight-arr 0))))))))
-	  (if (not nika-roller)
-	      (progn (setf nika-roller (t3da-importer "Nika_roll.t3da")
-			   (model-weights nika-roller) (make-array (list (car (array-dimensions (model-vertices nika-roller))))))
-		     (loop for n below (car (array-dimensions (tja-data-weights (model-animation nika-roller))))
-			do (let ((weight-arr (aref (tja-data-weights (model-animation nika-roller)) n)))
-			     (if (eq (aref (model-weights nika-roller) (aref weight-arr 0)) 0)
-				 (progn (setf (aref (model-weights nika-roller) (aref weight-arr 0)) nil
-					      (aref (model-weights nika-roller) (aref weight-arr 0)) (remove nil (aref (model-weights nika-roller) (aref weight-arr 0))))
-					(push (list (aref weight-arr 1) (aref weight-arr 2)) (aref (model-weights nika-roller) (aref weight-arr 0))))
-				 (push (list (aref weight-arr 1) (aref weight-arr 2)) (aref (model-weights nika-roller) (aref weight-arr 0))))))))
-	  (if (not nika-bent-jump)
-	      (progn (setf nika-bent-jump (t3da-importer "Nika_bent_side.t3da")
-			   (model-weights nika-bent-jump) (make-array (list (car (array-dimensions (model-vertices nika-bent-jump))))))
-		     (loop for n below (car (array-dimensions (tja-data-weights (model-animation nika-bent-jump))))
-			do (let ((weight-arr (aref (tja-data-weights (model-animation nika-bent-jump)) n)))
-			     (if (eq (aref (model-weights nika-bent-jump) (aref weight-arr 0)) 0)
-				 (progn (setf (aref (model-weights nika-bent-jump) (aref weight-arr 0)) nil
-					      (aref (model-weights nika-bent-jump) (aref weight-arr 0)) (remove nil (aref (model-weights nika-bent-jump) (aref weight-arr 0))))
-					(push (list (aref weight-arr 1) (aref weight-arr 2)) (aref (model-weights nika-bent-jump) (aref weight-arr 0))))
-				 (push (list (aref weight-arr 1) (aref weight-arr 2)) (aref (model-weights nika-bent-jump) (aref weight-arr 0))))))))
-	  (if (not robert)
-	      (progn (setf robert (t3da-importer "Robert.t3da")
-			   (model-weights robert) (make-array (list (car (array-dimensions (model-vertices robert))))))
-		     (loop for n below (car (array-dimensions (tja-data-weights (model-animation robert))))
-			do (let ((weight-arr (aref (tja-data-weights (model-animation robert)) n)))
-			     (if (eq (aref (model-weights robert) (aref weight-arr 0)) 0)
-				 (progn (setf (aref (model-weights robert) (aref weight-arr 0)) nil
-					      (aref (model-weights robert) (aref weight-arr 0)) (remove nil (aref (model-weights robert) (aref weight-arr 0))))
-					(push (list (aref weight-arr 1) (aref weight-arr 2)) (aref (model-weights robert) (aref weight-arr 0))))
-				 (push (list (aref weight-arr 1) (aref weight-arr 2)) (aref (model-weights robert) (aref weight-arr 0))))))))
-
-	  (setf (model-x alt-nika) 20.0
-		(model-x nika-bent-jump) 20.0
-		(model-x nika-roller) -20.0
-		(model-z robert) -100
-		(model-x nika) -20.0)
-	  |#
-;;	  (setf nika-dress-id (load-png #P"/home/neon-frost/Work Files/3D/Nika Dress Tex - Dress Patterns.png"))
+	  (gl:use-program shader-prog)
+	  (create-spatial-vao plane-2)
+;;	  (sdl2:hide-cursor)
           (sdl2:with-event-loop (:method :poll)
             (:keydown (:keysym keysym)
                       (let ((scancode (sdl2:scancode-value keysym))
@@ -406,7 +394,6 @@ void main()
             (:keyup (:keysym keysym)
                     (when (sdl2:scancode= (sdl2:scancode-value keysym) :scancode-escape)
                       (sdl2:push-event :quit)))
-
             (:mousemotion (:x x :y y :xrel xrel :yrel yrel :state state)
 			  (if (eq state 4)
 			      (incf world-scale (/ yrel -10.0)))
@@ -431,6 +418,7 @@ void main()
 	    (sdl2:rumble-play h 1.0 100))))
 	    |#
             (:idle ()
+		   (gl:get-error)
                    (gl:clear :color-buffer :depth-buffer)
 		   (test-opengl-draw)
                    (gl:flush)
@@ -448,233 +436,7 @@ void main()
 	(format t "Closing opened game controllers.~%")
 	(finish-output)))))
 
-;; close any game controllers that were opened as well as any haptics
-#|          (loop :for (i . controller) :in controllers
-:do (sdl2:game-controller-close controller)
-(sdl2:haptic-close (cdr (assoc i haptic)))))))))
-|#
 
-#|
-(require :lispbuilder-sdl)
-(require :cl-opengl)
-
-;;;;3bgl-shader is the Common LISP DSL for generating shaders
-
-(defun test ()
-  (sdl:with-init ()
-    (sdl:window 320 240
-		:title-caption "OpenGL example"
-		:opengl T
-		:opengl-attributes '((:SDL-GL-DOUBLEBUFFER 1)))
-    (gl:clear-color 0 0 0 0)
-    (gl:matrix-mode :projection)
-    (gl:load-identity)
-    (gl:ortho 0 1 0 1 -1 1)
-    (sdl:with-events ()
-      (:quit-event () t)
-      (WHEN (SDL:KEY= KEY :SDL-KEY-ESCAPE)
-	(SDL:PUSH-QUIT-EVENT))
-      (:idle ()
-	     (gl:clear :color-buffer-bit)
-	     (gl:color 1 1 1)
-	     (gl:with-primitive :polygon
-	       (gl:vertex 0.25 0.25 0.0)
-	       (gl:vertex 0.75 0.25 0.0)
-	       (gl:vertex 0.75 0.75 0.0)
-	       (gl:vertex 0.25 0.75 0.0))
-	     (gl:flush)
-	     (sdl:update-display)
-	     ))))
-
-(defvar filling 1)
-(defvar rotation-x 0)
-(defvar rotation-y 0)
-(defvar rotation-z 0)
-(defvar rotation-inc-x 0)
-(defvar rotation-inc-y 0)
-(defvar rotation-inc-z 0)
-
-(defun test-triangle ()
-  (sdl:with-init ()
-    (sdl:window 1040 700
-		:title-caption "Triangle Test"
-		:opengl T
-		:opengl-attributes '((:SDL-GL-DOUBLEBUFFER 1)))
-    (gl-init 1040 700)
-    (sdl:with-events ()
-      (:quit-event () t)
-      (:key-down-event (:key key)
-		       (key-input key))
-					;      (WHEN (SDL:KEY= KEY :SDL-KEY-ESCAPE) ;
-					;	(SDL:PUSH-QUIT-EVENT)) ;
-      (:idle ()
-	     #|	     (gl:clear :color-buffer-bit)
-	     (gl:color 1 1 1)
-	     (gl:with-primitive :polygon
-	     (gl:vertex 0.25 0.25 0.0)
-	     (gl:vertex 0.75 0.25 0.0)
-	     (gl:vertex 0.75 0.75 0.0)
-	     (gl:vertex 0.25 0.75 0.0))
-	     (gl:flush)|#
-	     (draw triangle)
-	     (sdl:update-display)
-	     (incf rotation-inc-y 10)
-	     ))))
-
-(defun test-cube ()
-  (sdl:with-init ()
-    (sdl:window 640 480
-		:title-caption "Cube Test"
-		:opengl T
-		:opengl-attributes '((:SDL-GL-DOUBLEBUFFER 1)))
-    (gl-init 640 480)
-    (sdl:with-events ()
-      (:quit-event () t)
-      (:key-down-event (:key key)
-		       (key-input key))
-					;      (WHEN (SDL:KEY= KEY :SDL-KEY-ESCAPE) ;
-					;	(SDL:PUSH-QUIT-EVENT)) ;
-      (:idle ()
-	     #|	     (gl:clear :color-buffer-bit)
-	     (gl:color 1 1 1)
-	     (gl:with-primitive :polygon
-	     (gl:vertex 0.25 0.25 0.0)
-	     (gl:vertex 0.75 0.25 0.0)
-	     (gl:vertex 0.75 0.75 0.0)
-	     (gl:vertex 0.25 0.75 0.0))
-	     (gl:flush)|#
-	     (draw cube)
-	     (sdl:update-display)
-	     ))))
-
-(defun test-pyramid ()
-  (sdl:with-init ()
-    (sdl:window 960 720
-		:title-caption "Pyramid Test"
-		:opengl T
-		:opengl-attributes '((:SDL-GL-DOUBLEBUFFER 1)))
-    (gl-init 960 720)
-    (sdl:with-events ()
-      (:quit-event () t)
-      (:key-down-event (:key key)
-		       (key-input key))
-					;      (WHEN (SDL:KEY= KEY :SDL-KEY-ESCAPE) ;
-					;	(SDL:PUSH-QUIT-EVENT)) ;
-      (:idle ()
-	     #|	     (gl:clear :color-buffer-bit)
-	     (gl:color 1 1 1)
-	     (gl:with-primitive :polygon
-	     (gl:vertex 0.25 0.25 0.0)
-	     (gl:vertex 0.75 0.25 0.0)
-	     (gl:vertex 0.75 0.75 0.0)
-	     (gl:vertex 0.25 0.75 0.0))
-	     (gl:flush)|#
-	     (draw pyramid)
-	     (sdl:update-display)
-	     (incf rotation-inc-x 5)
-	     ))))
-
-(defun test-diamond ()
-  (sdl:with-init ()
-    (sdl:window 960 720
-		:title-caption "Diamond Test"
-		:opengl T
-		:opengl-attributes '((:SDL-GL-DOUBLEBUFFER 1)))
-    (gl-init 960 720)
-    (sdl:with-events ()
-      (:quit-event () t)
-      (:key-down-event (:key key)
-		       (key-input key))
-					;      (WHEN (SDL:KEY= KEY :SDL-KEY-ESCAPE) ;
-					;	(SDL:PUSH-QUIT-EVENT)) ;
-      (:idle ()
-	     #|	     (gl:clear :color-buffer-bit)
-	     (gl:color 1 1 1)
-	     (gl:with-primitive :polygon
-	     (gl:vertex 0.25 0.25 0.0)
-	     (gl:vertex 0.75 0.25 0.0)
-	     (gl:vertex 0.75 0.75 0.0)
-	     (gl:vertex 0.25 0.75 0.0))
-	     (gl:flush)|#
-	     (draw diamond)
-	     (sdl:update-display)
-	     (incf rotation-inc-x 5)
-	     ))))
-
-
-
-(defun gl-init (width height)
-  (gl:clear-color 0 0 0 0)
-  (gl:shade-model :smooth)
-  (gl:viewport 0 0 width height)
-  (gl:matrix-mode :projection)
-  (gl:load-identity)
-  (gl:ortho -100 100 -100 100 -100 100)
-  (gl:enable :depth-test)
-  (gl:polygon-mode :front-and-back :fill)
-  )
-
-(defun key-input (key)
-  (case key
-    (:SDL-KEY-ESCAPE (SDL:PUSH-QUIT-EVENT))
-    (:sdl-key-space
-     (setf rotation-inc-x 0)
-     (setf rotation-inc-y 0)
-     (setf rotation-inc-z 0)
-     )
-    (:sdl-key-r
-     (if (eq filling 0)
-	 (progn (gl:polygon-mode :front-and-back :fill)
-		(setf filling 1))
-	 (progn (gl:polygon-mode :front-and-back :line)
-		(setf filling 0))))
-    (:sdl-key-up
-     (setf rotation-inc-x (+ rotation-inc-x 5)))
-    (:sdl-key-down
-     (setf rotation-inc-x (- rotation-inc-x 5)))
-    (:sdl-key-left
-     (setf rotation-inc-y (+ rotation-inc-y 5)))
-    (:sdl-key-right
-     (setf rotation-inc-y (- rotation-inc-y 5)))
-    )
-  )
-
-(defun draw (object)
-  (gl:clear :color-buffer-bit :depth-buffer-bit)
-  (gl:matrix-mode :modelview)
-  (gl:load-identity)
-  (gl:translate 0.0 0.0 -50)
-  (let ((rot-x (+ rotation-x rotation-inc-x))
-	(rot-y (+ rotation-y rotation-inc-y))
-	(rot-z (+ rotation-z rotation-inc-z)))
-    (if (> rot-x 359)
-	(setf rotation-x 0))
-    (if (> rot-y 359)
-	(setf rotation-y 0))
-    (if (> rot-z 359)
-	(setf rotation-z 0))
-    #|    (setf rotation-inc-x (+ rotation-inc-x 5))
-    (setf rotation-inc-y (+ rotation-inc-y 5))|#
-    (gl:rotate rot-x 1.0 0.0 0.0)
-    (gl:rotate rot-y 0.0 1.0 0.0)
-    (gl:rotate rot-z 0.0 0.0 1.0)
-    )
-  (gl:begin :triangles)
-  (loop for tri in (object-polygons object)
-     do (let ((va (polygon-a tri))
-	      (vb (polygon-b tri))
-	      (vc (polygon-c tri)))
-	  (gl:color 1.0 0.0 0.0)
-	  (gl:vertex (vertex-x va) (vertex-y va) (vertex-z va))
-	  (gl:color 0.0 1.0 0.0)
-	  (gl:vertex (vertex-x vb) (vertex-y vb) (vertex-z vb))
-	  (gl:color 0.0 0.0 1.0)
-	  (gl:vertex (vertex-x vc) (vertex-y vc) (vertex-z vc))))
-  (gl:end)
-  (gl:flush)
-  )
-
-|#
 (defun print-messages ()
   (loop for msg in (reverse tamias-3d-messages)
      do (princ msg)

@@ -1,4 +1,11 @@
-Milestone 1:
+Milestones 1:
+
+  A: Shaders are implemented and usable
+  B: Bones transferred to shaders
+  C: GUI & 3d engine are at pseudo-production ready
+  D: S'daia is finished
+
+Milestones 2:
 
   A: Nika travels along a plane with geometry (no collision, no up/down movement)
   B: Nika can move and attack, able to move between 2 rooms

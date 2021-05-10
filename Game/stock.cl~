@@ -1,0 +1,2 @@
+(load "Game/stock/stock-lib.cl")
+(load "Game/stock/stock-main.cl")

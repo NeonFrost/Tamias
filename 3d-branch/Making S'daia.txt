@@ -1,0 +1,10 @@
+Part one: Finish GUI in Tamias, finalize 3d engine basics.
+
+Part 2: Work on Armor/Weapon/Item creator thing for S'daia in Tamias, finish random-generator.
+
+Part 3: Use random-generator to create pseudo-textures. (these are made at run-time. utilizes the ASCII sheet.)
+     	Hammer down gameplay (What the screen will look like, how to attack, moving from area to area, etc.)
+	Finalize Armor/Weapon/Item creator and make everything.
+
+Part 4: Polish up S'daia
+     	Release to the world

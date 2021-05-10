@@ -1,3 +1,20 @@
+Midpoint mirror algo:
+
+x below midpoint : midpoint + (midpoint - x)
+x above midpoint : midpoint - (x - midpoint)
+
+midpoint = 128
+A - x= 32 :: 128 + (128 -  32) = 224
+B - x=196 :: 128 - (196 - 128) = 60
+If min/max value is 0
+   	   	 Max - X will get the reflection over the midpoint, no matter what the maximum value is
+
+Need to make an API document of sorts.
+Think DnD in LISP type of thing. A 'book' that goes through explains what's happening in the engine and what to call to get it to do those things
+Loading/Freeing resources should be done by the engine, with a simple and clear API that is accessed by the programmer.
+
+
+
 Engine is geared towards only 256 Megabytes of video memory being available
 
 Various things need to be kept track of, such as number of vertices, number of bones, number of textures, number of shaders, etc.

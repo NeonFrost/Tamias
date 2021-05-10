@@ -94,7 +94,7 @@
      ,@body))
 
 (defgeneric activate-interactive-object (tamias-object key-board? key-state ctrl alt shift mouse? mouse-button mouse-state move?)
-  (:method (tamias-object key-board? key-state ctrl alt shift mouse? mouse-state move?)
+  (:method (tamias-object key-board? key-state ctrl alt shift mouse? mouse-button mouse-state move?)
     nil)
   )
 

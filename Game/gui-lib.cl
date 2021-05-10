@@ -105,7 +105,8 @@ So, a simple example: Frame1->Frame2->Element1 . El-1 would be augmented by F2's
 
 (defstruct (ui-menu (:include ui-base
 			      (type 'menu)
-			      ))
+		     ))
+  acitve? ;;temp code because I'm a dumb slut
   active-item ;;active? is a symbol
   (items (make-hash-table)) ;;hash table of ui-menu-item(s)
   ids)
@@ -115,6 +116,7 @@ So, a simple example: Frame1->Frame2->Element1 . El-1 would be augmented by F2's
 				   (x 0)
 				   (y 0)))
   menu ;;is a ui-menu
+  drop-down-width
   )
 
 ;;ui-menu-item-action will be a macro that is just (ui-element-special ui-menu-item)
@@ -168,7 +170,7 @@ So, a simple example: Frame1->Frame2->Element1 . El-1 would be augmented by F2's
 	(width (ui-element-width ui-menu))
 	(height (ui-element-height ui-menu)))
     (loop for id in (ui-menu-ids ui-menu)
-       do (let (ui-mi-menu (ui-menu-item-menu (gethash id (ui-menu-items ui-menu))))
+       do (let ((ui-mi-menu (ui-menu-item-menu (gethash id (ui-menu-items ui-menu)))))
 	    ;;ui-mi-menu = ui-menu-item-menu
 	    (if ui-mi-menu
 		(if (ui-menu-active? ui-mi-menu)

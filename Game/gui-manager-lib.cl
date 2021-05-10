@@ -6,7 +6,7 @@
   `(gethash ,sub-state (gethash ,state ui-managers)))
 
 (defmacro get-current-menu-bar ()
-  (ui-manager-menu-bar (get-ui-manager (state-symbol tamias:state) (state-sub-state tamias:state))))
+  `(ui-manager-menu-bar (get-ui-manager (state-symbol tamias:state) (state-sub-state tamias:state))))
 
 (defmacro get-menu-bar (state sub-state)
   `(ui-manager-menu-bar (get-ui-manager ,state ,sub-state)))

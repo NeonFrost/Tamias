@@ -46,6 +46,7 @@ or
       (sdl2:set-render-draw-blend-mode tamias:renderer 1) ;;allows for transparency
       (update-window-size)
       (sdl2:stop-text-input)
+      (sdl2:hide-cursor)
       (sdl2:with-event-loop (:method :poll)
 	(:keydown (:keysym keysym)
 		  (keydown-check (sdl2:get-key-name (sdl2:sym-value keysym))))

@@ -1,0 +1,2 @@
+(define-state stock-simulator)
+(set-state stock-simulator)

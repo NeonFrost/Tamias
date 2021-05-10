@@ -1,0 +1,3 @@
+-Main character is cube
+
+-Use random terrain generator, map ASCII tile-map to texture.

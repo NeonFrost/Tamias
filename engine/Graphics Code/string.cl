@@ -3,12 +3,16 @@ On rendering strings, either use a ttf file and use a 'buffer' with the strings 
 |#
 (defpackage tamias.string
   (:use :cl)
-  (:export character-size
+  (:export text-length
+	   character-size
 	   create-text-buffer
 	   ascii-to-string
 	   parse-hex-color
-	   combine-strings))
+	   combine-strings
+	   text-chunker))
 (in-package :tamias.string)
+
+(defvar text-length 32)
 (defvar character-size '(16 16))
 
 (defun ascii-to-string (code)
@@ -21,6 +25,8 @@ On rendering strings, either use a ttf file and use a 'buffer' with the strings 
 
 (defun combine-strings (str &rest strings)
   "Used on strings that just need to be concatenated together, but not inserting a newline at the end of each of them."
+  (if (not (stringp str))
+      (setf str (write-to-string str)))
   (loop for s in strings
      do (if (not (stringp s))
 	    (setf s (write-to-string s)))
@@ -176,3 +182,16 @@ On rendering strings, either use a ttf file and use a 'buffer' with the strings 
       (values (values r g b 255))
       (list (list r g b 255))
       (otherwise (values r g b 255)))))
+
+(defun text-chunker (str &optional line-length)
+  (let ((rope-group nil)
+	(tmp-text str)
+	(str-pos 0)
+	(text-length (or line-length text-length)));;ensures no modification to original string
+    (loop while tmp-text
+       do (if (> (length tmp-text) text-length)
+	      (progn (push (subseq tmp-text str-pos (+ str-pos text-length)) rope-group)
+		     (setf tmp-text (subseq tmp-text (+ str-pos text-length))))
+	      (progn (push (subseq tmp-text str-pos) rope-group)
+		     (setf tmp-text nil))))
+    (reverse rope-group)))

@@ -16,3 +16,4 @@ Check which shader is required
       At this point, I'm unsure of whether or not I'm going to have it be model wide or object wide (i.e. (model-shader-id model) or (object-shader-id object))
       Decision has been made, shaders will be object wide.
       	       The shader subsystem will be a headache to implement, primarily linking objects into the shader groups
+

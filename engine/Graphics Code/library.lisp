@@ -387,40 +387,40 @@ This was for the roguelike I was/am working on
 (defun text (str x y &key width height (rotate 0) (color tamias:font-color) scale origin-is-center)
   (let ((src-width 0)
 	(src-height 0))
-  (if tamias:ttf-font
-      (let* ((str-surf (sdl2-ttf:render-text-solid tamias:ttf-font str
-						  255 255 255 0))
-	     (str-tex (sdl2:create-texture-from-surface tamias:renderer
-							str-surf)))
-	(sdl2:free-surface str-surf)
-	(tex-blit str-tex :dest (create-rectangle (list x y width height))
-		  :color color
-		  :angle rotate)
-	(sdl2:destroy-texture str-tex))
-      (progn
-	    ;;(setf (values text-width newline-count) (determine-string-width-nlc str)))
-	(let ((dim (text-dimensions str)))
-	  (setf src-width (car dim)
-		src-height (cadr dim)))
-      	(if (not width)
-	    (setf width src-width))
-	(if (not height)
-	    (setf height src-height))
-	(if scale
-	    (let ((string-width width)
-		  (string-height height))
-	      ;; stretches the text to the scale
-	      (setf width (round (* string-width scale))
-		    height (round (* string-height scale))
-		    x (- x (round (/ width 2)))
-		    y (- y (round (/ height 2))))
-	      ))
-	(if origin-is-center
-	    (progn (decf x (round (/ width 2)))
-		   (decf y (round (/ height 2)))))
+    (if tamias:ttf-font
+	(let* ((str-surf (sdl2-ttf:render-text-solid tamias:ttf-font str
+						     255 255 255 0))
+	       (str-tex (sdl2:create-texture-from-surface tamias:renderer
+							  str-surf)))
+	  (sdl2:free-surface str-surf)
+	  (tex-blit str-tex :dest (create-rectangle (list x y width height))
+		    :color color
+		    :angle rotate)
+	  (sdl2:destroy-texture str-tex))
+	(progn
+	  ;;(setf (values text-width newline-count) (determine-string-width-nlc str)))
+	  (let ((dim (text-dimensions str)))
+	    (setf src-width (car dim)
+		  src-height (cadr dim)))
+      	  (if (not width)
+	      (setf width src-width))
+	  (if (not height)
+	      (setf height src-height))
+	  (if scale
+	      (let ((string-width width)
+		    (string-height height))
+		;; stretches the text to the scale
+		(setf width (round (* string-width scale))
+		      height (round (* string-height scale))
+		      x (- x (round (/ width 2)))
+		      y (- y (round (/ height 2))))
+		))
+	  (if origin-is-center
+	      (progn (decf x (round (/ width 2)))
+		     (decf y (round (/ height 2)))))
 	;;(render-string str x y :width width :height height :dest-width dest-width :dest-height dest-height :rotate rotate :color color :anti-alias t))
 	;;      (render-string str x y :width width :height height :dest-width dest-width :dest-height dest-height :rotate rotate :color color :anti-alias t)))
-	(render-string str x y :width src-width :height src-height :string-width width :string-height height :rotate rotate :color color :anti-alias t)))))
+	  (render-string str x y :width src-width :height src-height :string-width width :string-height height :rotate rotate :color color :anti-alias t)))))
 #|
 old text-buffer code
 do (setf (values cell-row cell-column) (truncate (char-code (aref string n)) 16))

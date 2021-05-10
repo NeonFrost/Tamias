@@ -53,7 +53,7 @@
 (defvar *mouse-y* 0)
 (defvar *mouse-velocity-x* 0)
 (defvar *mouse-velocity-y* 0)
-(defparameter *cursor-size* 2)
+(defparameter *cursor-size* 5)
 
 (defvar track-volume 125)
 (defvar max-volume 125)

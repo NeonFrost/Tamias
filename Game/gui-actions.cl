@@ -23,9 +23,26 @@ Click in window -> tamias.gui.mouse-click -> check if menu-bar is active item? -
 		(incf x-acc str-size))))))
   ;;Check mouse-x against each item, set it to the active item and then drop down/open right, unless the active item is clicked, then deactivate the active-item, aka set to 0
   ;;note: the menu-bar sets the substate to 'menu-bar. Only check against y when the sub-state is 'menu-bar
-  ;;If the mouse-x and mouse-y are outside the region of the possible menu-bar-items, it deactivates the menu-bar and deactivates all the other things, and sets sub-state to 'top
+;;If the mouse-x and mouse-y are outside the region of the possible menu-bar-items, it deactivates the menu-bar and deactivates all the other things, and sets sub-state to 'top
+
+(defun activate-entry (ui-element)
+  (setf current-text-context (ui-element-entry ui-element)
+	*text-input-state* 'edit)
+  (sdl2:start-text-input))
+
+(defun deactivate-entry ()
+  (setf current-text-context nil
+	*text-input-state* nil)
+  (sdl2:stop-text-input))
+
 (defmethod action.click (ui-element (ui-type (eql 'entry)))
-  (setf current-text-context (ui-element-entry ui-element)))
+  ;;maybe put the position finding up here instead?
+  ;;Like....hurm. Option 1: Click to activate entry. Click again to place the cursor
+  ;;Option 2: Click to activate AND place cursor (if mouse was inside text area)
+  (activate-entry ui-element)
+  ;;Then we use mouse-x and mouse-y to figure out where to put the cursor
+  ;;requires ensuring that the cursor was inside the
+  )
 ;;set current text stuff to the ui-element-entry
 (defmethod action.click (ui-element (ui-type (eql 'spin-box)))
   ;;check which region got clicked
@@ -37,10 +54,10 @@ Click in window -> tamias.gui.mouse-click -> check if menu-bar is active item? -
 	     (<= tamias:*mouse-y* y-max))
 	(if (and (>= tamias:*mouse-y* (- y-max 16))
 		 (<= tamias:*mouse-y* (- y-max 8)))
-	    (decf (tamias-value-value (number-entry-value (ui-element-special ui-element))))
-	    (incf (tamias-value-value (number-entry-value (ui-element-special ui-element))))))))
-;;(incf (tamias-value-value (ui-spin-box-value (ui-element-special ui-element))))
-;;(decf (tamias-value-value (ui-spin-box-value (ui-element-special ui-element))))
+	    (decf (tamias-variable-value (number-entry-value (ui-element-special ui-element))))
+	    (incf (tamias-variable-value (number-entry-value (ui-element-special ui-element))))))))
+;;(incf (tamias-variable-value (ui-spin-box-value (ui-element-special ui-element))))
+;;(decf (tamias-variable-value (ui-spin-box-value (ui-element-special ui-element))))
 
 ;;;Forgot about this, but with the symbol, make it a spinbox with a max of 255. Use the integer to display an Ascii character
 
@@ -61,13 +78,14 @@ Click in window -> tamias.gui.mouse-click -> check if menu-bar is active item? -
   (eval (ui-element-action ui-element)))
 
 (defun action.prep (ui-element ui-type)
-  (setf current-text-context nil
-	)
+  (if (ui-element-entry ui-element)
+      (if (not (eq current-text-context (ui-element-entry ui-element)))
+	  (deactivate-entry)))
   (action.click ui-element ui-type))
 
 (defun tamias.gui.menu-bar-item.click (ui-menu-bar-item)
-  (let ((inital-x (ui-menu-bar-item-x current-menu-bar-item))
-	(width-accumulator (ui-menu-bar-item-width current-menu-bar-item))
+  (let ((inital-x (ui-menu-item-x current-menu-bar-item))
+	(width-accumulator (ui-menu-item-width current-menu-bar-item))
 	)
     
     ))
@@ -93,7 +111,7 @@ Click in window -> tamias.gui.mouse-click -> check if menu-bar is active item? -
 (defun gui.window.click (element x-acc y-acc)
   )
 
-"Uh huh. So, this is still in development code (great).
+"Uh huh. So, this is still development code (great).
 So gui.click.check goes through each non menu-bar element and determines what got clicked by the mouse (or pointer)
 The gist is tamias.gui.click : -> menu-bar active? -> no -> is the pointer in the range of the menu-bar? -> no -> Then check which element was clicked
 
@@ -102,16 +120,20 @@ I've done a small improvement to it and added a case statement.
 If you're reading this, just remember: Documentation is important. For every second it takes to write a procedure, it requires 1 minute to decipher.
 "
 (defun gui.click.check ()
-  (let ((ui-manager (get-ui-manager (state-symbol tamias:state) (state-sub-state tamias:state))))
+  (let ((ui-manager (get-ui-manager (state-symbol tamias:state) (state-sub-state tamias:state)))
+	(clicked nil))
 ;;    (print "click")
     (loop for element in (ui-manager-collection ui-manager)
        do (case (ui-base-type element)
 	    (frame (if (gui.frame.click element 0 0)
-		       (return t)))
+		       (return (setf clicked t))))
 	    (window (if (gui.window.click element 0 0)
-			(return t)))
+			(return (setf clicked t))))
 	    (otherwise (if (mouse.test-position (ui-base-x element) (ui-base-y element) (ui-base-width element) (ui-base-height element) 'box)
-			   (return (action.prep element (ui-base-type element)))))))))
+			   (return (progn (setf clicked t)
+					  (action.prep element (ui-base-type element))))))))
+    (if (not clicked)
+	(deactivate-entry))))
 
 
 (defun tamias.gui.click ()
@@ -123,7 +145,7 @@ If you're reading this, just remember: Documentation is important. For every sec
 	  (if current-menu-bar-item
       ;;then handle the mouse click, going through each entry in the ui-menu-bar's sub-menus and such. If the mouse-x lies outside the beginning or end of the start and finish of the sub-menus, then deactivate the menus. This is alpha code, so don't worry about making it perfect.
 	      (let ((current-item (gethash current-menu-bar-item (ui-menu-bar-items ui-menu-bar))))
-		(if (< tamias:*mouse-x* (ui-menu-bar-item-x current-item))
+		(if (< tamias:*mouse-x* (ui-menu-item-x current-item))
 		    (setf (ui-menu-bar-active-item ui-menu-bar) nil)
 		    (if (> tamias:*mouse-y* (cadr tamias.string:character-size))
 			(gui.get-menu-bar-item.click current-item))))
@@ -131,7 +153,8 @@ If you're reading this, just remember: Documentation is important. For every sec
 	      (if (> tamias:*mouse-y* (cadr tamias.string:character-size))
 		  (gui.click.check)
 		  ;;then go through each frame and check if the mouse click is on any of the underlying elements
-		  (action.click ui-menu-bar 'menu-bar)
+		  (progn (deactivate-entry)
+			 (action.click ui-menu-bar 'menu-bar))
 		  )
 	      ))
 	(gui.click.check))))

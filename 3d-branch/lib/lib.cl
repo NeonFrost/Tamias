@@ -93,6 +93,7 @@ test string: "1.2e-1"
   vertices
   normal-vertices
   texture-vertices
+  (use-vao t)
   objects
   shaders ;;initial version will be a list. Final version will have it be an array...well, for the pure game engine. If it's in, like, an editor, then it's a list...unless...
   animation ;;intial use is of tja
@@ -232,6 +233,7 @@ Leave a trail:
 ;;  (vertices nil) ;;make it an array, contigent upon the number of vertices in a list. Unfortunately, this may increase load times
   (polygons nil) ;;make it an array, contigent upon the number of polygons made from the vertices.
   (info nil)
+  shaders
   vao
   ibo
   vbo-ids
@@ -310,4 +312,3 @@ Leave a trail:
       (point-texture-index (polygon-b (aref (object-polygons (car (model-objects dress-plane))) 1))) 3
       (point-texture-index (polygon-c (aref (object-polygons (car (model-objects dress-plane))) 1))) 2)
 |#
-(load "vao.cl")

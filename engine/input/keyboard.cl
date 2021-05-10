@@ -1,20 +1,46 @@
-(defstruct tamias-value
+(defstruct tamias-variable
   type
   value);;for use with editable non-string fields
 
 (defstruct tamias-text
   (text " ")
-  (position 1))
+  (position 1)
+  line-length
+  (cursor-timer 0)
+  (cursor-blink-off 20)
+  (cursor-hide nil)
+  (cursor-blink-on 24)
+  (cursor-blinks 0)
+  (cursor-blink-timeout 1200)
+  (cursor-blink-stop nil))
+
+(defun cursor-blink-check (tamias-text)
+  (incf (tamias-text-cursor-timer tamias-text))
+  (if (>= (tamias-text-cursor-timer tamias-text) (tamias-text-cursor-blink-timeout tamias-text))
+      (setf (tamias-text-cursor-blink-stop tamias-text) t)
+      (setf (tamias-text-cursor-blink-stop tamias-text) nil))
+  (if (not (tamias-text-cursor-blink-stop tamias-text))
+      (progn (if (> (tamias-text-cursor-timer tamias-text) (+ (tamias-text-cursor-blink-off tamias-text)
+				    (* (tamias-text-cursor-blink-on tamias-text) (tamias-text-cursor-blinks tamias-text))))
+		 (setf (tamias-text-cursor-hide tamias-text) t))
+	     (if (> (tamias-text-cursor-timer tamias-text) (+ (tamias-text-cursor-blink-on tamias-text)
+				    (* (tamias-text-cursor-blink-on tamias-text) (tamias-text-cursor-blinks tamias-text))))
+		 (progn (setf (tamias-text-cursor-hide tamias-text) nil)
+			(incf (tamias-text-cursor-blinks tamias-text)))))))
+	     
 
 (defvar current-text-context nil)
 (defvar *text-input-state* nil)
 
 (defun handle-text-input (text)
+  (setf (tamias-text-cursor-timer current-text-context) 0
+	(tamias-text-cursor-hide current-text-context) nil
+	(tamias-text-cursor-blinks current-text-context) 0)
   (let ((text (tamias.string:ascii-to-string text)))
-    (setf current-text-context (with-output-to-string (stream)
-				 (write-string (subseq current-text-context 0 (tamias-text-position current-text-context)) stream)
+    (setf (tamias-text-text current-text-context) (with-output-to-string (stream)
+				 (write-string (subseq (tamias-text-text current-text-context) 0 (tamias-text-position current-text-context)) stream)
 				 (write-string text stream)
-				 (write-string (subseq current-text-context (tamias-text-position current-text-context)) stream)))
+				 (write-string (subseq (tamias-text-text current-text-context) (tamias-text-position current-text-context)) stream)))
     ;;				 (combine-strings current-text-context text))
     (incf (tamias-text-position current-text-context) 1)
     ))
@@ -70,6 +96,38 @@
 		   (setf *selection-column* max-column)))))
 |#
 
+(defun text-key-check (key)
+  (case key
+    (:return (if (eq *text-input-state* 'edit)
+		 (progn (setf current-text-context (with-output-to-string (stream)
+						     (if (< (tamias-text-position current-text-context) (length current-text-context))
+							 (progn (write-string (subseq current-text-context 0 (1+ (tamias-text-position current-text-context))) stream)
+								(fresh-line stream)
+								(write-string (subseq current-text-context (tamias-text-position current-text-context)) stream))
+							 (progn (write-string (subseq current-text-context 0 (tamias-text-position current-text-context)) stream)
+								(fresh-line stream)
+								(write-string (subseq current-text-context (tamias-text-position current-text-context)) stream)))))
+			(incf (tamias-text-position current-text-context) 1))))
+    (:backspace (if (and (>= (tamias-text-position current-text-context) 1)
+			 (<= (tamias-text-position current-text-context) (length (tamias-text-text current-text-context))))
+		    (progn (setf (tamias-text-text current-text-context) (with-output-to-string (stream)
+							(write-string (subseq (tamias-text-text current-text-context) 0 (1- (tamias-text-position current-text-context))) stream)
+							(write-string (subseq (tamias-text-text current-text-context) (tamias-text-position current-text-context)) stream)))
+			   (decf (tamias-text-position current-text-context) 1))))
+    #|		      (if (and *text-input-state*
+    (> *current-text-position* 0))
+    (progn (setf current-text-context (with-output-to-string (stream)
+    (write-string (subseq current-text-context 0 (1- *current-text-position*)) stream)))
+    (decf *current-text-position* 1)))))|#
+    (:right (if (<= (tamias-text-position current-text-context) (1- (length (tamias-text-text current-text-context))))
+		(incf (tamias-text-position current-text-context) 1)))
+    (:left (if (>= (tamias-text-position current-text-context) 1)
+	       (decf (tamias-text-position current-text-context) 1)))
+    ;;up and down for text.
+    ))
+
+  
+
 (defun keydown-check (key)
   (let ((key (intern (substitute #\- #\space (string-upcase key)) "KEYWORD")))
 ;    (print key)
@@ -79,38 +137,11 @@
       (:shift ;;(or :Left-Shift :Right-Shift)
        (setf (modifier-states-shift modifier-states) t))
       (:alt (setf (modifier-states-meta modifier-states) t))
-      (:return (if *text-input-state*
-		   (progn (setf current-text-context (with-output-to-string (stream)
-						     (if (< (tamias-text-position current-text-context) (length current-text-context))
-							 (progn (write-string (subseq current-text-context 0 (1+ (tamias-text-position current-text-context))) stream)
-								(fresh-line stream)
-								(write-string (subseq current-text-context (tamias-text-position current-text-context)) stream))
-							 (progn (write-string (subseq current-text-context 0 (tamias-text-position current-text-context)) stream)
-								(fresh-line stream)
-								(write-string (subseq current-text-context (tamias-text-position current-text-context)) stream)))))
-			(incf (tamias-text-position current-text-context) 1))))
-      (:backspace (if (and *text-input-state*
-			   (> (tamias-text-position current-text-context) 0)
-			   (< (tamias-text-position current-text-context) (length current-text-context)))
-		      (progn (setf current-text-context (with-output-to-string (stream)
-							  (write-string (subseq current-text-context 0 (1- (tamias-text-position current-text-context))) stream)
-							  (write-string (subseq current-text-context (tamias-text-position current-text-context)) stream)))
-			     (decf (tamias-text-position current-text-context) 1))))
-#|		      (if (and *text-input-state*
-			       (> *current-text-position* 0))
-			  (progn (setf current-text-context (with-output-to-string (stream)
-							      (write-string (subseq current-text-context 0 (1- *current-text-position*)) stream)))
-				 (decf *current-text-position* 1)))))|#
-      (:right (if *text-input-state*
-		  (if (< (tamias-text-position current-text-context) (length current-text-context))
-		      (incf (tamias-text-position current-text-context) 1))))
-      (:left  (if *text-input-state*
-		  (if (> (tamias-text-position current-text-context) 0)
-		      (decf (tamias-text-position current-text-context) 1))))
       (:Escape (quit-game))
       (:|`| (if (ctrl-t)
 		(quit-game))))
-    (if (not *text-input-state*)
+    (if current-text-context
+	(text-key-check key)
 	(tamias-key key (state-symbol tamias:state) tamias:sub-state :down (ctrl-t) (alt-t) (shift-t)))))
 	#|(and (not *text-input-state*)
 	     (gethash key (gethash :down (state-keys (eval tamias:state)))))
