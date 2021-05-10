@@ -32,7 +32,7 @@ Shaders will be bound per model group
        ;;     (gl:vertex-attrib-pointer 0 3 :float nil 3 (cffi:null-pointer))
 ;;         (gl:enable-vertex-attrib-array 0)
        ;;	 (gl:draw-arrays :triangles 0 4)
-	 (gl:draw-elements :triangles (gl:make-null-gl-array :unsigned-short) :count 3)
+	 (gl:draw-elements :triangles (gl:make-null-gl-array :unsigned-short) :count 6)
 #|	 (gl:translate (- (+ (object-x object) (model-x model))) (- (+ (object-y object)  (model-y model))) (- (+ (object-z object) (model-z model))))
 	 (gl:load-identity)
 	 (gl:translate (+ 0.0 camera-x) (+ -50.0 camera-y) (+ -300 camera-z))

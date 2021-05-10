@@ -15,19 +15,23 @@ I may end up either creating an auxilary table which will have symbols as keys, 
 (defstruct tamias-shader
   name
   id
-  string)
+  string
+  error)
 (defvar tamias-vertex-shaders (make-hashtable))
 (defvar tamias-fragment-shaders (make-hashtable))
 (defvar tamias-geometry-shaders (make-hashtable))
 (defvar current-vertex-shader-id 0)
 (defvar current-fragment-shader-id 0)
 (defvar current-geometry-shader-id 0)
+
+"On compilation of shader, run (gl:get-shader-info-log SHADER) and put it into tamias-shader-error slot"
     
 (defmacro make-shader (shader-id shader-table shader-name shader-string)
   `(setf (gethash ,shader-id ,shader-table) (make-tamias-shader
 					     :name ,shader-name
 					     :id ,shader-id
 					     :string ,shader-string)))
+
 (defun get-shader (shader-id shader-type)
   (case shader-type
     (:vertex (gethash shader-id tamias-vertex-shaders))

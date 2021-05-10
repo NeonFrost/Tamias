@@ -112,7 +112,7 @@ gl_Position = vec4(vertexPosition_modelspace, 1.0);
 //    UV = vertexUV;
 
 }")
-(setf *vert-shader* "#version 140
+(setf *vert-shader* "#version 130
 
 // Input vertex data, different for all executions of this shader.
 in vec3 vertexPosition_modelspace;
@@ -162,6 +162,10 @@ void main()
 (defvar anim-running? t)
 (setf anim-running? nil)
 (defun test-opengl-draw ()
+  (gl:get-error)
+  (gl:clear :color-buffer :depth-buffer)
+  (gl:flush)
+
   (if rotating
       (progn (incf world-rotation-inc-x .5)
 	     (incf world-rotation-inc-z .5)))
@@ -378,8 +382,9 @@ void main()
           (sdl2:with-event-loop (:method :poll)
             (:keydown (:keysym keysym)
                       (let ((scancode (sdl2:scancode-value keysym))
-                            (sym (sdl2:sym-value keysym))
-                            (mod-value (sdl2:mod-value keysym)))
+                            ;;(sym (sdl2:sym-value keysym))
+                            ;;(mod-value (sdl2:mod-value keysym))
+			    )
 			(key-input scancode)
 			#|                        (cond
 			((sdl2:scancode= scancode :scancode-w) (format t "~a~%" "WALK"))
@@ -418,11 +423,8 @@ void main()
 	    (sdl2:rumble-play h 1.0 100))))
 	    |#
             (:idle ()
-		   (gl:get-error)
-                   (gl:clear :color-buffer :depth-buffer)
 		   (test-opengl-draw)
-                   (gl:flush)
-                   (sdl2:gl-swap-window win)
+		   (sdl2:gl-swap-window win)
 		   (incf garbage-timer)
 		   (if (> garbage-timer 1000)
 		       (progn (setf garbage-timer 0)
