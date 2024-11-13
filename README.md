@@ -1,3 +1,5 @@
+This repo is no longer maintained please visit: https://codeberg.org/neonfrost/Tamias
+
 # Tamias
 For an up to date codebase, go to: https://bitbucket.org/NeonFrostedFlakes/tamias/src/master/
 
